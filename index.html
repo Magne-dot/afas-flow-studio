@@ -750,6 +750,198 @@
   .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
   .section-header { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; padding: 8px 10px 4px; }
+
+  /* ── FLOW BUILDER ── */
+  .flow-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .flow-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .flow-card:hover { border-color: var(--accent); }
+  .flow-card-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .flow-card-name { font-weight:600; font-size:14px; }
+  .flow-schedule-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: rgba(79,142,247,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(79,142,247,0.25);
+  }
+  .flow-schedule-badge.manual {
+    background: rgba(74,85,107,0.2);
+    color: var(--text3);
+    border-color: var(--border);
+  }
+  .flow-meta { font-size:12px; color:var(--text2); line-height:1.8; font-family:var(--mono); }
+  .flow-meta span { color:var(--text3); }
+  .flow-pipeline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+  }
+  .flow-node-pill {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-family: var(--mono);
+  }
+  .pill-extract { background:rgba(79,142,247,0.15); color:var(--accent); }
+  .pill-join    { background:rgba(167,139,250,0.15); color:#a78bfa; }
+  .pill-transform { background:rgba(245,166,35,0.15); color:var(--warn); }
+  .pill-load    { background:rgba(62,207,142,0.15); color:var(--success); }
+  .pill-arrow   { color:var(--text3); font-size:10px; }
+
+  .flow-last-run { font-size:11px; color:var(--text3); margin-top:8px; padding-top:8px; border-top:1px solid var(--border); display:flex; align-items:center; gap:6px; }
+  .run-ok  { color:var(--success); }
+  .run-err { color:var(--danger); }
+  .run-never { color:var(--text3); }
+
+  .flow-actions { display:flex; gap:6px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+
+  /* ── CANVAS NODES ── */
+  .palette-node {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .palette-node:hover { border-color: var(--accent); background: rgba(79,142,247,0.06); }
+
+  .node-type-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .canvas-node {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 260px;
+    flex-shrink: 0;
+    transition: border-color 0.15s;
+    position: relative;
+  }
+  .canvas-node:hover { border-color: rgba(79,142,247,0.5); }
+  .canvas-node.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(79,142,247,0.15); }
+
+  .canvas-node-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .canvas-node-type {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: var(--mono);
+    letter-spacing: .04em;
+  }
+  .cnt-extract   { background:rgba(79,142,247,0.2); color:var(--accent); }
+  .cnt-join      { background:rgba(167,139,250,0.2); color:#a78bfa; }
+  .cnt-transform { background:rgba(245,166,35,0.2); color:var(--warn); }
+  .cnt-load      { background:rgba(62,207,142,0.2); color:var(--success); }
+
+  .canvas-node-title { font-size:13px; font-weight:500; flex:1; }
+  .canvas-node-remove { font-size:14px; color:var(--text3); cursor:pointer; padding:0 2px; }
+  .canvas-node-remove:hover { color:var(--danger); }
+
+  .canvas-node-body { padding:12px; display:flex; flex-direction:column; gap:8px; }
+
+  .node-field { display:flex; flex-direction:column; gap:4px; }
+  .node-field label { font-size:11px; color:var(--text2); }
+  .node-select, .node-input {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    outline: none;
+    width: 100%;
+  }
+  .node-select:focus, .node-input:focus { border-color: var(--accent); }
+
+  .node-connector-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0;
+    color: var(--text3);
+    font-size: 18px;
+    flex-shrink: 0;
+    align-self: center;
+    margin-top: 32px;
+  }
+
+  /* field mapper */
+  .field-mapper { display:flex; flex-direction:column; gap:4px; max-height:200px; overflow-y:auto; }
+  .field-map-row {
+    display: grid;
+    grid-template-columns: 1fr 20px 1fr;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+  }
+  .field-map-row span { text-align:center; color:var(--text3); }
+
+  /* transform ops */
+  .transform-ops { display:flex; flex-direction:column; gap:6px; }
+  .transform-op {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 8px;
+    font-size:11px;
+    position: relative;
+  }
+  .transform-op-header { display:flex; align-items:center; gap:6px; margin-bottom:6px; font-weight:600; color:var(--text2); }
+  .transform-op .remove-op { position:absolute; top:6px; right:6px; cursor:pointer; color:var(--text3); font-size:13px; }
+  .transform-op .remove-op:hover { color:var(--danger); }
+
+  .add-op-btn {
+    background: transparent;
+    border: 1px dashed var(--border);
+    color: var(--text3);
+    font-size: 11px;
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.15s;
+  }
+  .add-op-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* run log */
+  .log-line { margin-bottom:2px; }
+  .log-ok   { color:var(--success); }
+  .log-err  { color:var(--danger); }
+  .log-info { color:var(--text2); }
+  .log-warn { color:var(--warn); }
 </style>
 </head>
 <body>
@@ -877,19 +1069,130 @@
       </div>
     </div>
 
-    <!-- FLOWS PANEL (placeholder) -->
+    <!-- FLOWS PANEL -->
     <div class="panel" id="panel-flows">
-      <div class="panel-header">
-        <div>
-          <div class="panel-title">Flows</div>
-          <div class="panel-sub">ETL flows — coming in Session 2</div>
+      <!-- Flow list view -->
+      <div id="flowListView" style="display:flex; flex-direction:column; height:100%;">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Flows</div>
+            <div class="panel-sub">ETL pipelines — Extract → Transform → Load</div>
+          </div>
+          <div class="panel-header-right">
+            <button class="btn btn-primary btn-sm" onclick="openNewFlow()">+ New flow</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div id="flowGrid" class="flow-grid"></div>
+          <div id="flowEmpty" class="empty-state" style="height:400px; display:none">
+            <div class="empty-icon">⚡</div>
+            <div class="empty-title">No flows yet</div>
+            <div class="empty-sub">Create your first flow to start extracting data from AFAS, transforming it, and loading it into another connector.</div>
+            <button class="btn btn-primary" onclick="openNewFlow()">+ New flow</button>
+          </div>
         </div>
       </div>
-      <div class="panel-body">
-        <div class="empty-state" style="height:400px">
-          <div class="empty-icon">⚡</div>
-          <div class="empty-title">Flow builder — Session 2</div>
-          <div class="empty-sub">The node-based canvas for building Extract → Transform → Load flows will be built in Session 2. For now, use the Explorer to verify your environments and connectors work correctly.</div>
+
+      <!-- Flow builder view -->
+      <div id="flowBuilderView" style="display:none; flex-direction:column; height:100%;">
+        <div class="panel-header">
+          <button class="btn btn-ghost btn-sm" onclick="closeFlowBuilder()">← Back</button>
+          <div style="margin-left:8px">
+            <div class="panel-title" id="flowBuilderTitle">New flow</div>
+            <div class="panel-sub" id="flowBuilderSub">Build your pipeline</div>
+          </div>
+          <div class="panel-header-right">
+            <button class="btn btn-ghost btn-sm" onclick="runFlowNow()" id="runNowBtn">▶ Run now</button>
+            <button class="btn btn-primary btn-sm" onclick="saveFlow()">Save flow</button>
+          </div>
+        </div>
+
+        <!-- Flow meta bar -->
+        <div style="padding:10px 20px; background:var(--bg2); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:16px; flex-shrink:0; flex-wrap:wrap;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label style="font-size:12px; color:var(--text2)">Name</label>
+            <input type="text" class="form-input" id="flowName" placeholder="Flow name" style="width:200px; padding:5px 10px; font-size:13px;" />
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label style="font-size:12px; color:var(--text2)">Schedule</label>
+            <select class="form-select" id="flowSchedule" style="width:160px; padding:5px 10px; font-size:12px;">
+              <option value="">Manual only</option>
+              <option value="0 6 * * *">Daily 06:00</option>
+              <option value="0 7 * * *">Daily 07:00</option>
+              <option value="0 8 * * *">Daily 08:00</option>
+              <option value="0 12 * * *">Daily 12:00</option>
+              <option value="0 18 * * *">Daily 18:00</option>
+              <option value="0 22 * * *">Daily 22:00</option>
+              <option value="0 6 * * 1-5">Weekdays 06:00</option>
+              <option value="0 6 * * 1">Weekly Monday 06:00</option>
+              <option value="custom">Custom cron…</option>
+            </select>
+            <input type="text" class="form-input mono" id="flowCronCustom" placeholder="0 6 * * *" style="width:130px; padding:5px 10px; font-size:12px; display:none;" />
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label style="font-size:12px; color:var(--text2)">Environment</label>
+            <select class="form-select" id="flowEnvSelect" style="width:180px; padding:5px 10px; font-size:12px;">
+              <option value="">— use active —</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Canvas area -->
+        <div style="flex:1; display:flex; overflow:hidden;">
+
+          <!-- Node palette -->
+          <div style="width:180px; flex-shrink:0; background:var(--bg2); border-right:1px solid var(--border); padding:10px; display:flex; flex-direction:column; gap:6px; overflow-y:auto;">
+            <div style="font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.08em; padding:4px 0 8px;">Add nodes</div>
+            <div class="palette-node" onclick="addNode('extract')">
+              <span class="node-type-dot" style="background:#4f8ef7"></span>
+              <div>
+                <div style="font-size:12px; font-weight:600;">Extract</div>
+                <div style="font-size:10px; color:var(--text3);">GetConnector source</div>
+              </div>
+            </div>
+            <div class="palette-node" onclick="addNode('join')">
+              <span class="node-type-dot" style="background:#a78bfa"></span>
+              <div>
+                <div style="font-size:12px; font-weight:600;">Join</div>
+                <div style="font-size:10px; color:var(--text3);">Merge two datasets</div>
+              </div>
+            </div>
+            <div class="palette-node" onclick="addNode('transform')">
+              <span class="node-type-dot" style="background:#f5a623"></span>
+              <div>
+                <div style="font-size:12px; font-weight:600;">Transform</div>
+                <div style="font-size:10px; color:var(--text3);">Filter, map, calculate</div>
+              </div>
+            </div>
+            <div class="palette-node" onclick="addNode('load')">
+              <span class="node-type-dot" style="background:#3ecf8e"></span>
+              <div>
+                <div style="font-size:12px; font-weight:600;">Load</div>
+                <div style="font-size:10px; color:var(--text3);">UpdateConnector target</div>
+              </div>
+            </div>
+            <div style="margin-top:auto; padding-top:12px; border-top:1px solid var(--border);">
+              <div style="font-size:11px; color:var(--text3); line-height:1.6;">Click a node type to add it to the canvas. Configure each node by clicking on it.</div>
+            </div>
+          </div>
+
+          <!-- Canvas -->
+          <div style="flex:1; overflow:auto; padding:24px; background:var(--bg); position:relative;" id="flowCanvas">
+            <div id="flowCanvasInner" style="display:flex; gap:0; align-items:flex-start; min-height:300px; position:relative;">
+              <div id="canvasEmpty" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; color:var(--text3); pointer-events:none;">
+                <div style="font-size:32px; opacity:.3; margin-bottom:8px;">⚡</div>
+                <div style="font-size:13px;">Add nodes from the palette to build your flow</div>
+              </div>
+              <div id="nodeContainer" style="display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap; min-width:100%;"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Run log -->
+        <div id="runLogBar" style="display:none; background:var(--bg2); border-top:1px solid var(--border); padding:8px 20px; font-family:var(--mono); font-size:11px; color:var(--text2); max-height:120px; overflow-y:auto;">
+          <div style="font-weight:600; color:var(--text3); margin-bottom:4px;">RUN LOG</div>
+          <div id="runLogContent"></div>
         </div>
       </div>
     </div>
@@ -1108,6 +1411,11 @@ let state = {
   sortField: null,
   sortDir: 'asc',
   editingEnvId: null,
+  // Flows
+  flows: [],
+  activeFlowId: null,
+  editingFlow: null,       // flow being built in the canvas
+  flowNodeCounter: 0,
 };
 
 // ═══════════════════════════════════════════════
@@ -1118,6 +1426,7 @@ function save() {
     environments: state.environments,
     activeEnvId: state.activeEnvId,
     proxyUrl: state.proxyUrl,
+    flows: state.flows,
   }));
 }
 
@@ -1127,6 +1436,7 @@ function load() {
     state.environments = d.environments || [];
     state.activeEnvId = d.activeEnvId || null;
     state.proxyUrl = d.proxyUrl || '';
+    state.flows = d.flows || [];
   } catch(e) {}
 }
 
@@ -1732,6 +2042,677 @@ document.getElementById('envLicense').addEventListener('input', updateEnvPreview
 // ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// FLOW LIST
+// ═══════════════════════════════════════════════
+function renderFlowList() {
+  const grid = document.getElementById('flowGrid');
+  const empty = document.getElementById('flowEmpty');
+  const countBadge = document.getElementById('flowCount');
+  if (countBadge) countBadge.textContent = state.flows.length;
+
+  if (!grid) return;
+  if (state.flows.length === 0) {
+    grid.style.display = 'none';
+    empty.style.display = 'flex';
+    return;
+  }
+  grid.style.display = 'grid';
+  empty.style.display = 'none';
+
+  grid.innerHTML = state.flows.map(flow => {
+    const nodes = flow.nodes || [];
+    const schedule = flow.schedule || '';
+    const scheduleTxt = schedule ? schedule : 'Manual';
+    const badgeClass = schedule ? '' : 'manual';
+    const lastRun = flow.lastRun;
+    const lastRunHtml = lastRun
+      ? `<span class="${lastRun.ok ? 'run-ok' : 'run-err'}">${lastRun.ok ? '✓' : '✕'}</span> ${lastRun.ok ? 'Success' : 'Failed'} · ${new Date(lastRun.ts).toLocaleString()}`
+      : `<span class="run-never">Never run</span>`;
+
+    const pipelineHtml = nodes.map((n, i) => `
+      ${i > 0 ? '<span class="pill-arrow">→</span>' : ''}
+      <span class="flow-node-pill pill-${n.type}">${n.type}</span>
+    `).join('');
+
+    const envName = state.environments.find(e => e.id === (flow.envId || state.activeEnvId))?.name || 'Active env';
+
+    return `<div class="flow-card">
+      <div class="flow-card-header">
+        <div class="flow-card-name">${flow.name || 'Unnamed flow'}</div>
+        <span class="flow-schedule-badge ${badgeClass}">${scheduleTxt}</span>
+      </div>
+      <div class="flow-meta"><span>Env</span> ${envName}</div>
+      <div class="flow-pipeline">${pipelineHtml || '<span style="color:var(--text3);font-size:11px">No nodes</span>'}</div>
+      <div class="flow-last-run">${lastRunHtml}</div>
+      <div class="flow-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editFlow('${flow.id}')">Edit</button>
+        <button class="btn btn-ghost btn-sm" onclick="runFlowById('${flow.id}')">▶ Run</button>
+        <button class="btn btn-danger-ghost btn-sm" onclick="deleteFlow('${flow.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function deleteFlow(id) {
+  const flow = state.flows.find(f => f.id === id);
+  if (!confirm(`Delete flow "${flow?.name}"?`)) return;
+  state.flows = state.flows.filter(f => f.id !== id);
+  save();
+  renderFlowList();
+  toast('Flow deleted', 'info');
+}
+
+// ═══════════════════════════════════════════════
+// FLOW BUILDER
+// ═══════════════════════════════════════════════
+function openNewFlow() {
+  state.editingFlow = {
+    id: Date.now().toString(),
+    name: '',
+    schedule: '',
+    envId: state.activeEnvId || '',
+    nodes: [],
+    lastRun: null,
+  };
+  state.flowNodeCounter = 0;
+  openFlowBuilder();
+}
+
+function editFlow(id) {
+  const flow = state.flows.find(f => f.id === id);
+  if (!flow) return;
+  // Deep clone
+  state.editingFlow = JSON.parse(JSON.stringify(flow));
+  state.flowNodeCounter = state.editingFlow.nodes.length;
+  openFlowBuilder();
+}
+
+function openFlowBuilder() {
+  const flow = state.editingFlow;
+  document.getElementById('flowListView').style.display = 'none';
+  document.getElementById('flowBuilderView').style.display = 'flex';
+  document.getElementById('flowBuilderTitle').textContent = flow.name || 'New flow';
+  document.getElementById('flowBuilderSub').textContent = flow.id ? 'Editing flow' : 'New flow';
+  document.getElementById('flowName').value = flow.name || '';
+
+  // Populate env select
+  const envSel = document.getElementById('flowEnvSelect');
+  envSel.innerHTML = '<option value="">— use active —</option>';
+  state.environments.forEach(env => {
+    const opt = document.createElement('option');
+    opt.value = env.id;
+    opt.textContent = env.name;
+    if (env.id === flow.envId) opt.selected = true;
+    envSel.appendChild(opt);
+  });
+
+  // Schedule
+  const schedSel = document.getElementById('flowSchedule');
+  const customInput = document.getElementById('flowCronCustom');
+  const presets = ['', '0 6 * * *','0 7 * * *','0 8 * * *','0 12 * * *','0 18 * * *','0 22 * * *','0 6 * * 1-5','0 6 * * 1'];
+  if (presets.includes(flow.schedule || '')) {
+    schedSel.value = flow.schedule || '';
+    customInput.style.display = 'none';
+  } else if (flow.schedule) {
+    schedSel.value = 'custom';
+    customInput.style.display = '';
+    customInput.value = flow.schedule;
+  }
+
+  renderCanvas();
+}
+
+function closeFlowBuilder() {
+  state.editingFlow = null;
+  document.getElementById('flowListView').style.display = 'flex';
+  document.getElementById('flowBuilderView').style.display = 'none';
+  document.getElementById('runLogBar').style.display = 'none';
+}
+
+document.addEventListener('change', function(e) {
+  if (e.target.id === 'flowSchedule') {
+    const customInput = document.getElementById('flowCronCustom');
+    customInput.style.display = e.target.value === 'custom' ? '' : 'none';
+  }
+});
+
+function saveFlow() {
+  const flow = state.editingFlow;
+  if (!flow) return;
+
+  flow.name = document.getElementById('flowName').value.trim() || 'Unnamed flow';
+  const schedSel = document.getElementById('flowSchedule').value;
+  flow.schedule = schedSel === 'custom' ? document.getElementById('flowCronCustom').value.trim() : schedSel;
+  flow.envId = document.getElementById('flowEnvSelect').value || state.activeEnvId || '';
+
+  // Collect node configs from DOM
+  collectNodeConfigs();
+
+  const existing = state.flows.findIndex(f => f.id === flow.id);
+  if (existing >= 0) {
+    state.flows[existing] = flow;
+  } else {
+    state.flows.push(flow);
+  }
+
+  save();
+  renderFlowList();
+  toast(`Flow "${flow.name}" saved`, 'success');
+  document.getElementById('flowBuilderTitle').textContent = flow.name;
+}
+
+// ═══════════════════════════════════════════════
+// CANVAS
+// ═══════════════════════════════════════════════
+function addNode(type) {
+  if (!state.editingFlow) return;
+  const id = `node_${++state.flowNodeCounter}`;
+  const defaults = {
+    extract:   { connectorId: '', label: 'Extract' },
+    join:      { leftField: '', rightField: '', joinType: 'LEFT', label: 'Join' },
+    transform: { ops: [], label: 'Transform' },
+    load:      { connectorId: '', fieldMap: [], label: 'Load' },
+  };
+  state.editingFlow.nodes.push({ id, type, ...defaults[type] });
+  renderCanvas();
+  document.getElementById('canvasEmpty').style.display = 'none';
+}
+
+function removeNode(id) {
+  if (!state.editingFlow) return;
+  state.editingFlow.nodes = state.editingFlow.nodes.filter(n => n.id !== id);
+  renderCanvas();
+}
+
+function collectNodeConfigs() {
+  if (!state.editingFlow) return;
+  state.editingFlow.nodes.forEach(node => {
+    if (node.type === 'extract') {
+      const sel = document.getElementById(`node_conn_${node.id}`);
+      if (sel) node.connectorId = sel.value;
+      node.label = node.connectorId || 'Extract';
+    } else if (node.type === 'join') {
+      const lf = document.getElementById(`node_lf_${node.id}`);
+      const rf = document.getElementById(`node_rf_${node.id}`);
+      const jt = document.getElementById(`node_jt_${node.id}`);
+      if (lf) node.leftField = lf.value;
+      if (rf) node.rightField = rf.value;
+      if (jt) node.joinType = jt.value;
+    } else if (node.type === 'transform') {
+      // ops collected inline on change
+    } else if (node.type === 'load') {
+      const sel = document.getElementById(`node_conn_${node.id}`);
+      if (sel) node.connectorId = sel.value;
+      node.label = node.connectorId || 'Load';
+      // field map collected inline
+    }
+  });
+}
+
+function renderCanvas() {
+  const container = document.getElementById('nodeContainer');
+  const emptyMsg = document.getElementById('canvasEmpty');
+  if (!state.editingFlow) return;
+
+  const nodes = state.editingFlow.nodes;
+  emptyMsg.style.display = nodes.length === 0 ? '' : 'none';
+
+  const getConnectors = state.connectors.get || [];
+  const updateConnectors = state.connectors.update || [];
+
+  container.innerHTML = nodes.map((node, idx) => {
+    const arrow = idx > 0 ? `<div class="node-connector-arrow">→</div>` : '';
+    let body = '';
+
+    if (node.type === 'extract') {
+      const opts = getConnectors.map(c =>
+        `<option value="${c.id}" ${c.id === node.connectorId ? 'selected' : ''}>${c.id}</option>`
+      ).join('');
+      body = `
+        <div class="node-field">
+          <label>GetConnector</label>
+          <select class="node-select" id="node_conn_${node.id}" onchange="onExtractChange('${node.id}', this.value)">
+            <option value="">— select —</option>
+            ${opts}
+          </select>
+        </div>
+        <div id="node_preview_${node.id}" style="font-size:10px; color:var(--text3);"></div>`;
+    }
+
+    else if (node.type === 'join') {
+      body = `
+        <div class="node-field">
+          <label>Join type</label>
+          <select class="node-select" id="node_jt_${node.id}">
+            <option value="LEFT" ${node.joinType==='LEFT'?'selected':''}>LEFT JOIN</option>
+            <option value="INNER" ${node.joinType==='INNER'?'selected':''}>INNER JOIN</option>
+          </select>
+        </div>
+        <div class="node-field">
+          <label>Left field (key)</label>
+          <input class="node-input" id="node_lf_${node.id}" placeholder="field name" value="${node.leftField||''}" />
+        </div>
+        <div class="node-field">
+          <label>Right field (key)</label>
+          <input class="node-input" id="node_rf_${node.id}" placeholder="field name" value="${node.rightField||''}" />
+        </div>
+        <div style="font-size:10px; color:var(--text3);">Connects to the two preceding Extract nodes</div>`;
+    }
+
+    else if (node.type === 'transform') {
+      const ops = node.ops || [];
+      const opsHtml = ops.map((op, oi) => renderOpHtml(node.id, op, oi)).join('');
+      body = `
+        <div class="transform-ops" id="ops_${node.id}">${opsHtml}</div>
+        <select class="node-select" onchange="addTransformOp('${node.id}', this.value); this.value='';" style="margin-top:4px;">
+          <option value="">+ Add operation…</option>
+          <option value="filter">Filter rows</option>
+          <option value="rename">Rename field</option>
+          <option value="calc">Calculated column</option>
+          <option value="replace">Find & replace</option>
+          <option value="dateformat">Date format</option>
+        </select>`;
+    }
+
+    else if (node.type === 'load') {
+      const opts = updateConnectors.map(c =>
+        `<option value="${c.id}" ${c.id === node.connectorId ? 'selected' : ''}>${c.id} — ${c.description||''}</option>`
+      ).join('');
+      const mapHtml = renderFieldMapHtml(node);
+      body = `
+        <div class="node-field">
+          <label>UpdateConnector</label>
+          <select class="node-select" id="node_conn_${node.id}" onchange="onLoadConnectorChange('${node.id}', this.value)">
+            <option value="">— select —</option>
+            ${opts}
+          </select>
+        </div>
+        <div id="node_fieldmap_${node.id}">${mapHtml}</div>`;
+    }
+
+    const typeColors = { extract:'cnt-extract', join:'cnt-join', transform:'cnt-transform', load:'cnt-load' };
+    const typeLabels = { extract:'EXTRACT', join:'JOIN', transform:'TRANSFORM', load:'LOAD' };
+
+    return `${arrow}<div class="canvas-node" id="cnode_${node.id}">
+      <div class="canvas-node-header">
+        <span class="canvas-node-type ${typeColors[node.type]}">${typeLabels[node.type]}</span>
+        <span class="canvas-node-title">${node.label || node.type}</span>
+        <span class="canvas-node-remove" onclick="removeNode('${node.id}')">✕</span>
+      </div>
+      <div class="canvas-node-body">${body}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderOpHtml(nodeId, op, oi) {
+  const icons = { filter:'🔽', rename:'✏️', calc:'🔢', replace:'🔄', dateformat:'📅' };
+  const labels = { filter:'Filter rows', rename:'Rename field', calc:'Calculated column', replace:'Find & replace', dateformat:'Date format' };
+
+  let fields = '';
+  if (op.type === 'filter') {
+    fields = `<div style="display:grid; grid-template-columns:1fr 80px 1fr; gap:4px; align-items:center;">
+      <input class="node-input" placeholder="field" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value)" />
+      <select class="node-select" onchange="updateOp('${nodeId}',${oi},'op',this.value)">
+        <option ${op.op==='eq'?'selected':''} value="eq">=</option>
+        <option ${op.op==='neq'?'selected':''} value="neq">≠</option>
+        <option ${op.op==='gt'?'selected':''} value="gt">&gt;</option>
+        <option ${op.op==='lt'?'selected':''} value="lt">&lt;</option>
+        <option ${op.op==='contains'?'selected':''} value="contains">contains</option>
+        <option ${op.op==='notempty'?'selected':''} value="notempty">not empty</option>
+      </select>
+      <input class="node-input" placeholder="value" value="${op.value||''}" oninput="updateOp('${nodeId}',${oi},'value',this.value)" />
+    </div>`;
+  } else if (op.type === 'rename') {
+    fields = `<div style="display:grid; grid-template-columns:1fr 20px 1fr; gap:4px; align-items:center;">
+      <input class="node-input" placeholder="from" value="${op.from||''}" oninput="updateOp('${nodeId}',${oi},'from',this.value)" />
+      <span style="text-align:center; color:var(--text3);">→</span>
+      <input class="node-input" placeholder="to" value="${op.to||''}" oninput="updateOp('${nodeId}',${oi},'to',this.value)" />
+    </div>`;
+  } else if (op.type === 'calc') {
+    fields = `<div style="display:flex; flex-direction:column; gap:4px;">
+      <input class="node-input" placeholder="new column name" value="${op.name||''}" oninput="updateOp('${nodeId}',${oi},'name',this.value)" />
+      <input class="node-input" placeholder="formula e.g. {field1} * {field2}" value="${op.formula||''}" oninput="updateOp('${nodeId}',${oi},'formula',this.value)" style="font-family:var(--mono);" />
+    </div>`;
+  } else if (op.type === 'replace') {
+    fields = `<div style="display:flex; flex-direction:column; gap:4px;">
+      <input class="node-input" placeholder="in field" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value)" />
+      <div style="display:grid; grid-template-columns:1fr 20px 1fr; gap:4px; align-items:center;">
+        <input class="node-input" placeholder="find" value="${op.find||''}" oninput="updateOp('${nodeId}',${oi},'find',this.value)" />
+        <span style="text-align:center; color:var(--text3);">→</span>
+        <input class="node-input" placeholder="replace" value="${op.replace||''}" oninput="updateOp('${nodeId}',${oi},'replace',this.value)" />
+      </div>
+    </div>`;
+  } else if (op.type === 'dateformat') {
+    fields = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:4px;">
+      <input class="node-input" placeholder="field" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value)" />
+      <select class="node-select" onchange="updateOp('${nodeId}',${oi},'format',this.value)">
+        <option ${op.format==='YYYY-MM-DD'?'selected':''} value="YYYY-MM-DD">YYYY-MM-DD</option>
+        <option ${op.format==='DD-MM-YYYY'?'selected':''} value="DD-MM-YYYY">DD-MM-YYYY</option>
+        <option ${op.format==='DD/MM/YYYY'?'selected':''} value="DD/MM/YYYY">DD/MM/YYYY</option>
+        <option ${op.format==='MM/DD/YYYY'?'selected':''} value="MM/DD/YYYY">MM/DD/YYYY</option>
+        <option ${op.format==='timestamp'?'selected':''} value="timestamp">Unix timestamp</option>
+      </select>
+    </div>`;
+  }
+
+  return `<div class="transform-op">
+    <div class="transform-op-header">${icons[op.type]} ${labels[op.type]}</div>
+    <span class="remove-op" onclick="removeTransformOp('${nodeId}',${oi})">✕</span>
+    ${fields}
+  </div>`;
+}
+
+function addTransformOp(nodeId, type) {
+  if (!type) return;
+  const node = state.editingFlow?.nodes.find(n => n.id === nodeId);
+  if (!node) return;
+  node.ops = node.ops || [];
+  node.ops.push({ type });
+  const container = document.getElementById(`ops_${nodeId}`);
+  if (container) container.innerHTML = node.ops.map((op, oi) => renderOpHtml(nodeId, op, oi)).join('');
+}
+
+function removeTransformOp(nodeId, oi) {
+  const node = state.editingFlow?.nodes.find(n => n.id === nodeId);
+  if (!node) return;
+  node.ops.splice(oi, 1);
+  const container = document.getElementById(`ops_${nodeId}`);
+  if (container) container.innerHTML = node.ops.map((op, i) => renderOpHtml(nodeId, op, i)).join('');
+}
+
+function updateOp(nodeId, oi, key, value) {
+  const node = state.editingFlow?.nodes.find(n => n.id === nodeId);
+  if (!node || !node.ops[oi]) return;
+  node.ops[oi][key] = value;
+}
+
+function onExtractChange(nodeId, connectorId) {
+  const node = state.editingFlow?.nodes.find(n => n.id === nodeId);
+  if (!node) return;
+  node.connectorId = connectorId;
+  node.label = connectorId || 'Extract';
+  const preview = document.getElementById(`node_preview_${nodeId}`);
+  if (preview && connectorId) preview.textContent = `Will fetch from ${connectorId}`;
+  // Update title
+  const titleEl = document.querySelector(`#cnode_${nodeId} .canvas-node-title`);
+  if (titleEl) titleEl.textContent = connectorId || 'Extract';
+}
+
+function renderFieldMapHtml(node) {
+  if (!node.connectorId) return '<div style="font-size:10px;color:var(--text3);">Select a connector first</div>';
+  const fieldMap = node.fieldMap || [];
+  if (fieldMap.length === 0) return '<div style="font-size:10px;color:var(--text3);">Click "Map fields" after selecting connector</div>';
+  return `<div style="font-size:11px; font-weight:600; color:var(--text2); margin-bottom:4px;">Field mapping</div>
+    <div class="field-mapper">
+      ${fieldMap.map((m, mi) => `
+        <div class="field-map-row">
+          <input class="node-input" placeholder="source field" value="${m.from||''}" oninput="updateFieldMap('${node.id}',${mi},'from',this.value)" />
+          <span>→</span>
+          <input class="node-input" placeholder="AFAS field" value="${m.to||''}" oninput="updateFieldMap('${node.id}',${mi},'to',this.value)" />
+        </div>`).join('')}
+    </div>
+    <button class="add-op-btn" style="margin-top:4px;" onclick="addFieldMapRow('${node.id}')">+ Add mapping</button>`;
+}
+
+function onLoadConnectorChange(nodeId, connectorId) {
+  const node = state.editingFlow?.nodes.find(n => n.id === nodeId);
+  if (!node) return;
+  node.connectorId = connectorId;
+  node.label = connectorId || 'Load';
+  const titleEl = document.querySelector(`#cnode_${nodeId} .canvas-node-title`);
+  if (titleEl) titleEl.textContent = connectorId || 'Load';
+
+  // Auto-load fields from metainfo and pre-populate mapping
+  if (connectorId) {
+    const env = getActiveEnv();
+    if (env) {
+      afasFetch(env, `/metainfo/update/${connectorId}`).then(meta => {
+        const fields = meta.fields || [];
+        node.fieldMap = fields.filter(f => !f.primaryKey).map(f => ({ from: '', to: f.fieldId, toLabel: f.label || f.fieldId }));
+        const mapContainer = document.getElementById(`node_fieldmap_${nodeId}`);
+        if (mapContainer) mapContainer.innerHTML = renderFieldMapHtml(node);
+      }).catch(() => {});
+    }
+  }
+}
+
+function addFieldMapRow(nodeId) {
+  const node = state.editingFlow?.nodes.find(n => n.id === nodeId);
+  if (!node) return;
+  node.fieldMap = node.fieldMap || [];
+  node.fieldMap.push({ from: '', to: '' });
+  const mapContainer = document.getElementById(`node_fieldmap_${nodeId}`);
+  if (mapContainer) mapContainer.innerHTML = renderFieldMapHtml(node);
+}
+
+function updateFieldMap(nodeId, mi, key, value) {
+  const node = state.editingFlow?.nodes.find(n => n.id === nodeId);
+  if (!node || !node.fieldMap[mi]) return;
+  node.fieldMap[mi][key] = value;
+}
+
+function getActiveEnv() {
+  const flow = state.editingFlow;
+  const envId = (flow?.envId) || state.activeEnvId;
+  return state.environments.find(e => e.id === envId) || null;
+}
+
+// ═══════════════════════════════════════════════
+// FLOW EXECUTION ENGINE
+// ═══════════════════════════════════════════════
+function runFlowNow() {
+  collectNodeConfigs();
+  const flow = state.editingFlow;
+  if (!flow) return;
+  executeFlow(flow);
+}
+
+async function runFlowById(id) {
+  const flow = state.flows.find(f => f.id === id);
+  if (!flow) return;
+  openPanel('flows');
+  editFlow(id);
+  setTimeout(() => executeFlow(state.editingFlow), 100);
+}
+
+function log(msg, type = 'info') {
+  const bar = document.getElementById('runLogBar');
+  const content = document.getElementById('runLogContent');
+  if (!bar || !content) return;
+  bar.style.display = 'block';
+  const line = document.createElement('div');
+  line.className = `log-line log-${type}`;
+  line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  content.appendChild(line);
+  bar.scrollTop = bar.scrollHeight;
+}
+
+async function executeFlow(flow) {
+  const env = getActiveEnv();
+  if (!env) { toast('No environment selected', 'error'); return; }
+  if (!flow.nodes || flow.nodes.length === 0) { toast('Flow has no nodes', 'error'); return; }
+
+  const content = document.getElementById('runLogContent');
+  if (content) content.innerHTML = '';
+  log(`Starting flow: ${flow.name || 'Unnamed'}`, 'info');
+
+  let datasets = {};  // nodeId → array of row objects
+  let success = true;
+
+  try {
+    for (const node of flow.nodes) {
+      if (node.type === 'extract') {
+        if (!node.connectorId) { log(`Extract: no connector selected — skipping`, 'warn'); continue; }
+        log(`Extract: fetching ${node.connectorId}…`, 'info');
+        const data = await afasFetch(env, `/connectors/${node.connectorId}?skip=0&take=1000`);
+        const rows = data.rows || [];
+        datasets[node.id] = rows;
+        log(`Extract: got ${rows.length} rows from ${node.connectorId}`, 'ok');
+      }
+
+      else if (node.type === 'join') {
+        const extractNodes = flow.nodes.filter(n => n.type === 'extract');
+        if (extractNodes.length < 2) { log('Join: need at least 2 Extract nodes', 'warn'); continue; }
+        const left = datasets[extractNodes[0].id] || [];
+        const right = datasets[extractNodes[1].id] || [];
+        log(`Join: ${node.joinType} JOIN on ${node.leftField} = ${node.rightField} (${left.length} × ${right.length} rows)`, 'info');
+
+        const rightIndex = {};
+        right.forEach(row => {
+          const key = row[node.rightField];
+          if (key !== undefined) rightIndex[key] = row;
+        });
+
+        let joined;
+        if (node.joinType === 'INNER') {
+          joined = left.filter(row => rightIndex[row[node.leftField]] !== undefined)
+            .map(row => ({ ...row, ...rightIndex[row[node.leftField]] }));
+        } else {
+          joined = left.map(row => ({ ...row, ...(rightIndex[row[node.leftField]] || {}) }));
+        }
+
+        datasets[node.id] = joined;
+        log(`Join: result ${joined.length} rows`, 'ok');
+      }
+
+      else if (node.type === 'transform') {
+        const prevNode = flow.nodes[flow.nodes.indexOf(node) - 1];
+        const input = prevNode ? (datasets[prevNode.id] || []) : [];
+        let rows = [...input];
+        log(`Transform: processing ${rows.length} rows with ${(node.ops||[]).length} operations`, 'info');
+
+        for (const op of (node.ops || [])) {
+          if (op.type === 'filter') {
+            const before = rows.length;
+            rows = rows.filter(row => {
+              const val = String(row[op.field] ?? '');
+              const cmp = String(op.value ?? '');
+              if (op.op === 'eq') return val === cmp;
+              if (op.op === 'neq') return val !== cmp;
+              if (op.op === 'gt') return parseFloat(val) > parseFloat(cmp);
+              if (op.op === 'lt') return parseFloat(val) < parseFloat(cmp);
+              if (op.op === 'contains') return val.toLowerCase().includes(cmp.toLowerCase());
+              if (op.op === 'notempty') return val !== '' && val !== 'null' && val !== 'undefined';
+              return true;
+            });
+            log(`  Filter (${op.field} ${op.op} ${op.value}): ${before} → ${rows.length} rows`, 'info');
+          }
+          else if (op.type === 'rename') {
+            rows = rows.map(row => {
+              const r = { ...row };
+              if (op.from in r) { r[op.to] = r[op.from]; delete r[op.from]; }
+              return r;
+            });
+            log(`  Rename: ${op.from} → ${op.to}`, 'info');
+          }
+          else if (op.type === 'calc') {
+            rows = rows.map(row => {
+              const r = { ...row };
+              try {
+                const formula = op.formula.replace(/\{(\w+)\}/g, (_, f) => {
+                  const v = row[f];
+                  return isNaN(v) ? `"${v}"` : v;
+                });
+                r[op.name] = Function('"use strict"; return (' + formula + ')')();
+              } catch(e) { r[op.name] = null; }
+              return r;
+            });
+            log(`  Calc: added column "${op.name}"`, 'info');
+          }
+          else if (op.type === 'replace') {
+            rows = rows.map(row => {
+              const r = { ...row };
+              if (r[op.field] !== undefined) {
+                r[op.field] = String(r[op.field]).split(op.find).join(op.replace || '');
+              }
+              return r;
+            });
+            log(`  Replace in ${op.field}: "${op.find}" → "${op.replace}"`, 'info');
+          }
+          else if (op.type === 'dateformat') {
+            rows = rows.map(row => {
+              const r = { ...row };
+              if (r[op.field]) {
+                try {
+                  const d = new Date(r[op.field]);
+                  if (!isNaN(d)) {
+                    const fmt = op.format || 'YYYY-MM-DD';
+                    const pad = n => String(n).padStart(2,'0');
+                    if (fmt === 'YYYY-MM-DD') r[op.field] = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+                    else if (fmt === 'DD-MM-YYYY') r[op.field] = `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()}`;
+                    else if (fmt === 'DD/MM/YYYY') r[op.field] = `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+                    else if (fmt === 'MM/DD/YYYY') r[op.field] = `${pad(d.getMonth()+1)}/${pad(d.getDate())}/${d.getFullYear()}`;
+                    else if (fmt === 'timestamp') r[op.field] = d.getTime();
+                  }
+                } catch(e) {}
+              }
+              return r;
+            });
+            log(`  Date format ${op.field} → ${op.format}`, 'info');
+          }
+        }
+        datasets[node.id] = rows;
+        log(`Transform done: ${rows.length} rows`, 'ok');
+      }
+
+      else if (node.type === 'load') {
+        if (!node.connectorId) { log('Load: no connector selected — skipping', 'warn'); continue; }
+        const prevNode = flow.nodes[flow.nodes.indexOf(node) - 1];
+        const input = prevNode ? (datasets[prevNode.id] || []) : [];
+        const fieldMap = node.fieldMap || [];
+
+        log(`Load: sending ${input.length} rows to ${node.connectorId}…`, 'info');
+        let loaded = 0, errors = 0;
+
+        for (const row of input) {
+          // Build AFAS update object from field mapping
+          const afasRow = {};
+          fieldMap.forEach(m => {
+            if (m.from && m.to && row[m.from] !== undefined) {
+              afasRow[m.to] = row[m.from];
+            }
+          });
+
+          if (Object.keys(afasRow).length === 0) continue;
+
+          try {
+            await afasFetch(env, `/connectors/${node.connectorId}`, 'POST', {
+              KnSubject: { Element: { Fields: afasRow } }
+            });
+            loaded++;
+          } catch(e) {
+            errors++;
+            if (errors <= 3) log(`  Row error: ${e.message}`, 'err');
+          }
+        }
+
+        log(`Load complete: ${loaded} OK, ${errors} errors`, errors > 0 ? 'warn' : 'ok');
+      }
+    }
+
+    // Update last run
+    const savedFlow = state.flows.find(f => f.id === flow.id);
+    if (savedFlow) {
+      savedFlow.lastRun = { ok: true, ts: Date.now() };
+      save();
+      renderFlowList();
+    }
+    log('✓ Flow completed successfully', 'ok');
+    toast('Flow completed successfully', 'success');
+
+  } catch(e) {
+    success = false;
+    log(`✕ Flow failed: ${e.message}`, 'err');
+    toast(`Flow failed: ${e.message}`, 'error');
+    const savedFlow = state.flows.find(f => f.id === flow.id);
+    if (savedFlow) {
+      savedFlow.lastRun = { ok: false, ts: Date.now() };
+      save();
+    }
+  }
+}
+
 load();
 
 // Populate proxy input
@@ -1739,12 +2720,14 @@ if (state.proxyUrl) document.getElementById('proxyUrlInput').value = state.proxy
 
 renderEnvironments();
 updateStatusDot();
+renderFlowList();
 
-// If active env already selected, show it
+// If active env already selected, auto-connect
 if (state.activeEnvId && state.proxyUrl) {
-  // Don't auto-load connectors on start, let user trigger
+  document.getElementById('statusDot').className = 'status-dot loading';
+  document.getElementById('statusText').textContent = 'connecting…';
+  loadConnectors();
 }
 </script>
 </body>
 </html>
-
