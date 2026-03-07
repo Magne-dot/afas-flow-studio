@@ -872,11 +872,11 @@
   .data-preview-wrap { flex:1; overflow:auto; }
   .data-preview-wrap::-webkit-scrollbar { width:6px; height:6px; }
   .data-preview-wrap::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
-  .dp-table { width:100%; border-collapse:collapse; font-size:11px; font-family:var(--mono); white-space:nowrap; }
+  .dp-table { width:100%; border-collapse:collapse; font-size:12px; font-family:var(--sans); white-space:nowrap; }
   .dp-table thead tr { background:var(--bg3); position:sticky; top:0; z-index:5; }
-  .dp-table th { padding:7px 12px; text-align:left; font-size:10px; font-weight:600; color:var(--text2); border-bottom:1px solid var(--border); text-transform:uppercase; letter-spacing:.03em; }
+  .dp-table th { padding:7px 12px; text-align:left; font-size:11px; font-weight:600; color:var(--text2); border-bottom:1px solid var(--border); letter-spacing:.01em; }
   .dp-table th.new-col { color:var(--warn); }
-  .dp-table td { padding:5px 12px; border-bottom:1px solid rgba(42,51,71,.4); color:var(--text2); max-width:200px; overflow:hidden; text-overflow:ellipsis; }
+  .dp-table td { padding:6px 12px; border-bottom:1px solid rgba(42,51,71,.4); color:var(--text); max-width:220px; overflow:hidden; text-overflow:ellipsis; font-size:12px; }
   .dp-table tbody tr:hover td { background:rgba(79,142,247,.04); color:var(--text); }
   .dp-table td.new-col-val { color:var(--warn); }
   .cell-null { color:var(--text3); font-style:italic; }
@@ -2295,39 +2295,50 @@ function renderConfigTab(body, node) {
             <option value="">— select connector —</option>${opts}
           </select>
         </div>
-        ${node.connectorId ? `<div style="margin-top:8px">
+        ${node.connectorId ? `<div style="margin-top:10px; display:flex; align-items:center; gap:10px;">
           <button class="btn btn-ghost btn-sm" onclick="fetchExtractPreview('${node.id}')">⟳ Fetch data</button>
-          ${state.blockDatasets[node.id] ? `<span style="font-size:11px; color:var(--success); margin-left:8px;">✓ ${state.blockDatasets[node.id].length} rows loaded</span>` : ''}
+          ${state.blockDatasets[node.id] ? `<span style="font-size:12px; color:var(--success);">✓ ${state.blockDatasets[node.id].length} rows loaded</span>` : '<span style="font-size:12px; color:var(--text3);">No data yet</span>'}
         </div>` : ''}
       </div>
     </div>`;
   }
 
   else if (node.type === 'join') {
-    const prevExtract = getPrevDatasetOptions(node);
+    const flow0 = state.editingFlow;
+    const jidx = flow0.nodes.findIndex(n=>n.id===node.id);
+    const upstreams = flow0.nodes.slice(0,jidx).filter(n=>state.blockDatasets[n.id]);
+    const leftOpts  = upstreams.map(n=>`<option value="${n.id}" ${n.id===node.leftNodeId?'selected':''}>${n.label} (${state.blockDatasets[n.id].length} rows)</option>`).join('');
+    const rightOpts = upstreams.map(n=>`<option value="${n.id}" ${n.id===node.rightNodeId?'selected':''}>${n.label} (${state.blockDatasets[n.id].length} rows)</option>`).join('');
     body.innerHTML = `<div class="config-area">
       <div class="config-section">
         <div class="config-section-title">Join settings</div>
         <div class="node-field">
           <label>Join type</label>
-          <select class="node-select" id="cfg_jt_${node.id}" onchange="updateNodeProp('${node.id}','joinType',this.value)">
-            <option value="LEFT"  ${node.joinType==='LEFT' ?'selected':''}>LEFT JOIN (keep all left rows)</option>
-            <option value="INNER" ${node.joinType==='INNER'?'selected':''}>INNER JOIN (only matching rows)</option>
+          <select class="node-select" onchange="updateNodeProp('${node.id}','joinType',this.value)">
+            <option value="LEFT"  ${node.joinType==='LEFT' ?'selected':''}>LEFT JOIN — keep all left rows</option>
+            <option value="INNER" ${node.joinType==='INNER'?'selected':''}>INNER JOIN — only matching rows</option>
           </select>
         </div>
         <div class="node-field">
-          <label>Left dataset key field</label>
-          <input class="node-input" id="cfg_lf_${node.id}" placeholder="e.g. MedewerkerID" value="${node.leftField||''}" oninput="updateNodeProp('${node.id}','leftField',this.value)" />
+          <label>Left dataset</label>
+          <select class="node-select" onchange="updateNodeProp('${node.id}','leftNodeId',this.value)">
+            <option value="">— pick dataset —</option>${leftOpts}
+          </select>
         </div>
         <div class="node-field">
-          <label>Right dataset key field</label>
-          <input class="node-input" id="cfg_rf_${node.id}" placeholder="e.g. Medewerker" value="${node.rightField||''}" oninput="updateNodeProp('${node.id}','rightField',this.value)" />
+          <label>Left key field</label>
+          <input class="node-input" placeholder="e.g. MedewerkerID" value="${node.leftField||''}" oninput="updateNodeProp('${node.id}','leftField',this.value)" />
         </div>
-      </div>
-      <div class="config-section">
-        <div class="config-section-title">Input</div>
-        <div style="font-size:11px; color:var(--text2); line-height:1.7;">Uses the two most recent Extract blocks as left and right datasets. Run the flow to see the join result.</div>
-        ${prevExtract}
+        <div class="node-field">
+          <label>Right dataset</label>
+          <select class="node-select" onchange="updateNodeProp('${node.id}','rightNodeId',this.value)">
+            <option value="">— pick dataset —</option>${rightOpts}
+          </select>
+        </div>
+        <div class="node-field">
+          <label>Right key field</label>
+          <input class="node-input" placeholder="e.g. Medewerker" value="${node.rightField||''}" oninput="updateNodeProp('${node.id}','rightField',this.value)" />
+        </div>
       </div>
     </div>`;
   }
@@ -2335,26 +2346,63 @@ function renderConfigTab(body, node) {
   else if (node.type === 'transform') {
     const ops = node.ops || [];
     const opsHtml = ops.map((op,oi) => renderOpHtml(node.id, op, oi)).join('');
-    body.innerHTML = `<div class="config-area">
-      <div class="config-section">
-        <div class="config-section-title">Operations <span style="font-weight:400;color:var(--text3)">(applied in order)</span></div>
-        <div id="ops_${node.id}">${opsHtml}</div>
-        <select class="node-select" style="margin-top:6px;" onchange="addTransformOp('${node.id}',this.value);this.value='';">
-          <option value="">+ Add operation…</option>
-          <option value="filter">Filter rows</option>
-          <option value="rename">Rename field</option>
-          <option value="calc">Calculated column</option>
-          <option value="replace">Find &amp; replace</option>
-          <option value="dateformat">Date format</option>
-        </select>
+    // find upstream dataset for live preview
+    const flow2 = state.editingFlow;
+    const tidx  = flow2.nodes.findIndex(n=>n.id===node.id);
+    const upNode = flow2.nodes.slice(0,tidx).reverse().find(n=>state.blockDatasets[n.id]);
+    const upDs   = upNode ? state.blockDatasets[upNode.id] : null;
+    const previewHtml = upDs
+      ? buildPreviewTable(applyTransformOps([...upDs], ops), ops.filter(o=>o.type==='calc').map(o=>o.name).filter(Boolean))
+      : `<div style="padding:20px; text-align:center; font-size:12px; color:var(--text3);">Fetch data from an Extract block above to see live preview here</div>`;
+    body.innerHTML = `<div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+      <div style="padding:12px 16px; overflow-y:auto; flex-shrink:0; max-height:50%; border-bottom:1px solid var(--border);">
+        <div class="config-section">
+          <div class="config-section-title">Operations <span style="font-weight:400;color:var(--text3)">(applied in order)</span></div>
+          <div id="ops_${node.id}">${opsHtml}</div>
+          <select class="node-select" style="margin-top:8px;" onchange="addTransformOp('${node.id}',this.value);this.value='';">
+            <option value="">+ Add operation…</option>
+            <option value="filter">Filter rows</option>
+            <option value="rename">Rename field</option>
+            <option value="calc">Calculated column</option>
+            <option value="replace">Find &amp; replace</option>
+            <option value="dateformat">Date format</option>
+          </select>
+        </div>
       </div>
-      ${node.connectorId||state.blockDatasets[node.id] ? `<button class="btn btn-ghost btn-sm" onclick="applyTransformPreview('${node.id}')">⟳ Apply &amp; preview</button>` : ''}
+      <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+        <div style="padding:6px 14px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:11px; font-weight:600; color:var(--text3); display:flex; align-items:center; gap:8px; flex-shrink:0; text-transform:uppercase; letter-spacing:.06em;">
+          Live preview ${upDs ? `<span style="font-weight:400;color:var(--text2);text-transform:none;">— from <em>${upNode.label}</em></span>` : ''}
+        </div>
+        <div id="transform_preview_${node.id}" style="flex:1; overflow:hidden; display:flex; flex-direction:column;">
+          ${previewHtml}
+        </div>
+      </div>
     </div>`;
   }
 
   else if (node.type === 'load') {
-    const opts = updC.map(c => `<option value="${c.id}" ${c.id===node.connectorId?'selected':''}>${c.id} — ${c.description||''}</option>`).join('');
+    const opts = updC.map(c => `<option value="${c.id}" ${c.id===node.connectorId?'selected':''}>${c.id}${c.description?' — '+c.description:''}</option>`).join('');
+    const flow3 = state.editingFlow;
+    const lidx  = flow3.nodes.findIndex(n=>n.id===node.id);
+    const upstreamsWithData = flow3.nodes.slice(0,lidx).filter(n=>state.blockDatasets[n.id]);
+    const defId = upstreamsWithData.length>0 ? upstreamsWithData[upstreamsWithData.length-1].id : '';
+    if (!node.sourceNodeId && defId) node.sourceNodeId = defId;
+    const sourceOpts = upstreamsWithData.map(n =>
+      `<option value="${n.id}" ${n.id===(node.sourceNodeId||defId)?'selected':''}>${n.label} — ${state.blockDatasets[n.id].length} rows</option>`
+    ).join('');
     body.innerHTML = `<div class="config-area">
+      <div class="config-section">
+        <div class="config-section-title">Source dataset</div>
+        <div class="node-field">
+          <label>Load data from</label>
+          <select class="node-select" onchange="updateNodeProp('${node.id}','sourceNodeId',this.value)">
+            ${upstreamsWithData.length===0
+              ? '<option value="">— no data upstream, fetch first —</option>'
+              : sourceOpts}
+          </select>
+        </div>
+        <div style="font-size:11px; color:var(--text3); margin-top:4px; line-height:1.6;">Pick which step's output to send to AFAS. Default is the previous block's result.</div>
+      </div>
       <div class="config-section">
         <div class="config-section-title">UpdateConnector</div>
         <div class="node-field">
@@ -2362,21 +2410,12 @@ function renderConfigTab(body, node) {
             <option value="">— select connector —</option>${opts}
           </select>
         </div>
-        ${node.connectorId ? `<div style="font-size:11px; color:var(--text2); margin-top:6px;">Switch to the <strong style="color:var(--text)">Field mapping</strong> tab to map source fields to AFAS fields.</div>` : ''}
+        ${node.connectorId ? `<div style="font-size:12px; color:var(--text2); margin-top:8px; padding:8px; background:rgba(79,142,247,.06); border-radius:5px; border:1px solid rgba(79,142,247,.2);">
+          Open the <strong>Field mapping</strong> tab to map source columns to AFAS fields.
+        </div>` : ''}
       </div>
     </div>`;
   }
-}
-
-function getPrevDatasetOptions(node) {
-  const flow = state.editingFlow;
-  const idx = flow.nodes.findIndex(n=>n.id===node.id);
-  const extracts = flow.nodes.slice(0,idx).filter(n=>n.type==='extract');
-  if (extracts.length===0) return '<div style="font-size:11px;color:var(--text3)">No extract blocks found before this join</div>';
-  return extracts.map(e => {
-    const ds = state.blockDatasets[e.id];
-    return `<div style="font-size:11px; color:var(--text2); padding:4px 0;">${ds?'✓':'○'} ${e.label} ${ds?`(${ds.length} rows)`:'(not loaded)'}</div>`;
-  }).join('');
 }
 
 function updateNodeProp(id, key, value) {
@@ -2390,7 +2429,6 @@ function onExtractConnectorChange(nodeId, connectorId) {
   node.connectorId = connectorId;
   node.label = connectorId || 'Extract';
   updateBlockTitle(nodeId, node.label);
-  // Re-render config to show Fetch button
   const body = document.getElementById(`rp-body-${nodeId}`);
   if (body) renderConfigTab(body, node);
 }
@@ -2401,7 +2439,6 @@ function onLoadConnectorChange(nodeId, connectorId) {
   node.connectorId = connectorId;
   node.label = connectorId || 'Load';
   updateBlockTitle(nodeId, node.label);
-  // Auto-load fields from metainfo
   if (!connectorId) return;
   const env = getFlowEnv();
   if (!env) return;
@@ -2412,7 +2449,6 @@ function onLoadConnectorChange(nodeId, connectorId) {
       from: '', to: f.fieldId, toLabel: f.label || f.fieldId,
       toType: f.dataType, mandatory: !!f.mandatory
     }));
-    // Re-render config
     const body = document.getElementById(`rp-body-${nodeId}`);
     if (body) renderConfigTab(body, node);
   }).catch(()=>{});
@@ -2429,18 +2465,16 @@ async function fetchExtractPreview(nodeId) {
   if (!node || !node.connectorId) return;
   const env = getFlowEnv();
   if (!env) { toast('No environment selected','error'); return; }
-
   const body = document.getElementById(`rp-body-${nodeId}`);
-  body.innerHTML = '<div class="loading-row"><div class="spinner"></div> Fetching data…</div>';
-
+  body.innerHTML = '<div style="padding:30px; text-align:center; color:var(--text2);"><div class="spinner" style="margin:0 auto 10px;"></div>Fetching data…</div>';
   try {
     const data = await afasFetch(env, `/connectors/${node.connectorId}?skip=0&take=200`);
     const rows = data.rows || [];
     state.blockDatasets[nodeId] = rows;
-    // Update block status
     const statusEl = document.querySelector(`#block_${nodeId} .block-status`);
     if (statusEl) { statusEl.textContent = `${rows.length} rows`; statusEl.className='block-status ok'; }
-    // Switch to data tab
+    // Refresh any downstream transform blocks that are open
+    refreshDownstreamPreviews(nodeId);
     showRightPanel(node);
     switchRPTab(nodeId, 'data');
   } catch(e) {
@@ -2448,36 +2482,56 @@ async function fetchExtractPreview(nodeId) {
   }
 }
 
+function refreshDownstreamPreviews(changedNodeId) {
+  // If a transform block is currently open and its upstream is changedNodeId, refresh its preview
+  const flow = state.editingFlow;
+  if (!flow) return;
+  const changedIdx = flow.nodes.findIndex(n=>n.id===changedNodeId);
+  flow.nodes.slice(changedIdx+1).forEach(n => {
+    if (n.type !== 'transform') return;
+    const previewEl = document.getElementById(`transform_preview_${n.id}`);
+    if (!previewEl) return;
+    const upNode = flow.nodes.slice(0, flow.nodes.indexOf(n)).reverse().find(u=>state.blockDatasets[u.id]);
+    if (!upNode) return;
+    const newCols = (n.ops||[]).filter(o=>o.type==='calc').map(o=>o.name).filter(Boolean);
+    const result = applyTransformOps([...state.blockDatasets[upNode.id]], n.ops||[]);
+    previewEl.innerHTML = buildPreviewTable(result, newCols);
+  });
+}
+
+function buildPreviewTable(rows, newCols=[]) {
+  if (!rows || rows.length === 0) return '<div style="padding:20px; text-align:center; font-size:12px; color:var(--text3);">No rows to display</div>';
+  const cols = Object.keys(rows[0]);
+  const show = rows.slice(0, 100);
+  return `<div style="flex:1; overflow:hidden; display:flex; flex-direction:column;">
+    <div class="data-preview-wrap">
+      <table class="dp-table">
+        <thead><tr>${cols.map(c=>`<th class="${newCols.includes(c)?'new-col':''}">${c}</th>`).join('')}</tr></thead>
+        <tbody>${show.map(row=>`<tr>${cols.map(c=>`<td class="${newCols.includes(c)?'new-col-val':''}">${fmtCell(row[c])}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>
+    </div>
+    <div class="preview-meta-bar">
+      <span>${rows.length}</span> rows &nbsp;·&nbsp; <span>${cols.length}</span> cols
+      ${newCols.length ? ` &nbsp;·&nbsp; <span style="color:var(--warn);">${newCols.length} calculated</span>` : ''}
+      ${rows.length>100 ? ' &nbsp;·&nbsp; showing first 100' : ''}
+    </div>
+  </div>`;
+}
+
 function renderDataTab(body, node) {
   const ds = state.blockDatasets[node.id];
   const newCols = (node.ops||[]).filter(o=>o.type==='calc').map(o=>o.name).filter(Boolean);
-
   if (!ds || ds.length === 0) {
     body.innerHTML = node.type==='extract'
-      ? `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No data yet</div><div class="empty-sub">Click "Fetch data" in the Configure tab to load data from AFAS</div><button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="fetchExtractPreview('${node.id}')">Fetch data</button></div>`
-      : `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No preview yet</div><div class="empty-sub">Run the flow or click "Apply & preview" to see transformed data</div></div>`;
+      ? `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No data yet</div><div class="empty-sub">Click "Fetch data" in the Configure tab</div><button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="fetchExtractPreview('${node.id}')">Fetch data</button></div>`
+      : `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No data yet</div><div class="empty-sub">Run the flow to populate this dataset</div></div>`;
     return;
   }
-
-  const cols = Object.keys(ds[0] || {});
-  const displayRows = ds.slice(0, 100);
-
-  body.innerHTML = `
-    <div style="flex:1; overflow:hidden; display:flex; flex-direction:column;">
-      <div class="data-preview-wrap">
-        <table class="dp-table">
-          <thead><tr>${cols.map(c=>`<th class="${newCols.includes(c)?'new-col':''}">${c}</th>`).join('')}</tr></thead>
-          <tbody>${displayRows.map(row=>`<tr>${cols.map(c=>`<td class="${newCols.includes(c)?'new-col-val':''}">${fmtCell(row[c])}</td>`).join('')}</tr>`).join('')}</tbody>
-        </table>
-      </div>
-      <div class="preview-meta-bar">
-        <span>${ds.length}</span> rows · <span>${cols.length}</span> columns${newCols.length?` · <span style="color:var(--warn)">${newCols.length} calculated</span>`:''}${ds.length>100?' · showing first 100':''}
-      </div>
-    </div>`;
+  body.innerHTML = buildPreviewTable(ds, newCols);
 }
 
 function fmtCell(val) {
-  if (val===null||val===undefined||val==='') return '<span class="cell-null">null</span>';
+  if (val===null||val===undefined||val==='') return '<span class="cell-null">—</span>';
   if (typeof val==='boolean') return val?'<span class="cell-bool-t">true</span>':'<span class="cell-bool-f">false</span>';
   const s = String(val);
   if (/^\d{4}-\d{2}-\d{2}/.test(s)) return `<span class="cell-date">${s.slice(0,10)}</span>`;
@@ -2487,50 +2541,51 @@ function fmtCell(val) {
 
 // ── TRANSFORM OPS ──
 function renderOpHtml(nodeId, op, oi) {
-  const icons = { filter:'🔽', rename:'✏️', calc:'🔢', replace:'🔄', dateformat:'📅' };
+  const icons  = { filter:'▼', rename:'✎', calc:'ƒ', replace:'↔', dateformat:'🗓' };
   const labels = { filter:'Filter rows', rename:'Rename field', calc:'Calculated column', replace:'Find & replace', dateformat:'Date format' };
   let fields = '';
   if (op.type==='filter') {
-    fields = `<div style="display:grid;grid-template-columns:1fr 80px 1fr;gap:4px;align-items:center;">
-      <input class="node-input" placeholder="field" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value)"/>
-      <select class="node-select" onchange="updateOp('${nodeId}',${oi},'op',this.value)">
-        <option ${op.op==='eq'?'selected':''} value="eq">=</option>
-        <option ${op.op==='neq'?'selected':''} value="neq">≠</option>
-        <option ${op.op==='gt'?'selected':''} value="gt">&gt;</option>
-        <option ${op.op==='lt'?'selected':''} value="lt">&lt;</option>
+    fields = `<div style="display:grid;grid-template-columns:1fr 90px 1fr;gap:4px;align-items:center;">
+      <input class="node-input" placeholder="field name" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value);refreshTransformPreview('${nodeId}')"/>
+      <select class="node-select" onchange="updateOp('${nodeId}',${oi},'op',this.value);refreshTransformPreview('${nodeId}')">
+        <option ${op.op==='eq'      ?'selected':''} value="eq">= equals</option>
+        <option ${op.op==='neq'     ?'selected':''} value="neq">≠ not equals</option>
+        <option ${op.op==='gt'      ?'selected':''} value="gt">&gt; greater</option>
+        <option ${op.op==='lt'      ?'selected':''} value="lt">&lt; less</option>
         <option ${op.op==='contains'?'selected':''} value="contains">contains</option>
         <option ${op.op==='notempty'?'selected':''} value="notempty">not empty</option>
       </select>
-      <input class="node-input" placeholder="value" value="${op.value||''}" oninput="updateOp('${nodeId}',${oi},'value',this.value)"/>
+      <input class="node-input" placeholder="value" value="${op.value||''}" oninput="updateOp('${nodeId}',${oi},'value',this.value);refreshTransformPreview('${nodeId}')"/>
     </div>`;
   } else if (op.type==='rename') {
-    fields = `<div style="display:grid;grid-template-columns:1fr 20px 1fr;gap:4px;align-items:center;">
-      <input class="node-input" placeholder="from" value="${op.from||''}" oninput="updateOp('${nodeId}',${oi},'from',this.value)"/>
-      <span style="text-align:center;color:var(--text3)">→</span>
-      <input class="node-input" placeholder="to" value="${op.to||''}" oninput="updateOp('${nodeId}',${oi},'to',this.value)"/>
+    fields = `<div style="display:grid;grid-template-columns:1fr 24px 1fr;gap:4px;align-items:center;">
+      <input class="node-input" placeholder="from field" value="${op.from||''}" oninput="updateOp('${nodeId}',${oi},'from',this.value);refreshTransformPreview('${nodeId}')"/>
+      <span style="text-align:center;color:var(--text3);font-size:14px;">→</span>
+      <input class="node-input" placeholder="to field" value="${op.to||''}" oninput="updateOp('${nodeId}',${oi},'to',this.value);refreshTransformPreview('${nodeId}')"/>
     </div>`;
   } else if (op.type==='calc') {
-    fields = `<div style="display:flex;flex-direction:column;gap:4px;">
-      <input class="node-input" placeholder="new column name" value="${op.name||''}" oninput="updateOp('${nodeId}',${oi},'name',this.value)"/>
-      <input class="node-input mono" placeholder="formula: {field1} * {field2}" value="${op.formula||''}" oninput="updateOp('${nodeId}',${oi},'formula',this.value)" style="font-family:var(--mono)"/>
+    fields = `<div style="display:flex;flex-direction:column;gap:5px;">
+      <input class="node-input" placeholder="new column name" value="${op.name||''}" oninput="updateOp('${nodeId}',${oi},'name',this.value);refreshTransformPreview('${nodeId}')"/>
+      <input class="node-input" placeholder="formula e.g. {Uren} * {Tarief}" value="${op.formula||''}" oninput="updateOp('${nodeId}',${oi},'formula',this.value);refreshTransformPreview('${nodeId}')" style="font-family:var(--mono);font-size:11px;"/>
+      <div style="font-size:10px;color:var(--text3);">Use {fieldName} to reference columns. Supports +, -, *, /, Math.round(), etc.</div>
     </div>`;
   } else if (op.type==='replace') {
-    fields = `<div style="display:flex;flex-direction:column;gap:4px;">
-      <input class="node-input" placeholder="in field" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value)"/>
-      <div style="display:grid;grid-template-columns:1fr 20px 1fr;gap:4px;align-items:center;">
-        <input class="node-input" placeholder="find" value="${op.find||''}" oninput="updateOp('${nodeId}',${oi},'find',this.value)"/>
-        <span style="text-align:center;color:var(--text3)">→</span>
-        <input class="node-input" placeholder="replace" value="${op.replace||''}" oninput="updateOp('${nodeId}',${oi},'replace',this.value)"/>
+    fields = `<div style="display:flex;flex-direction:column;gap:5px;">
+      <input class="node-input" placeholder="field name" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value);refreshTransformPreview('${nodeId}')"/>
+      <div style="display:grid;grid-template-columns:1fr 24px 1fr;gap:4px;align-items:center;">
+        <input class="node-input" placeholder="find text" value="${op.find||''}" oninput="updateOp('${nodeId}',${oi},'find',this.value);refreshTransformPreview('${nodeId}')"/>
+        <span style="text-align:center;color:var(--text3);font-size:14px;">→</span>
+        <input class="node-input" placeholder="replace with" value="${op.replace||''}" oninput="updateOp('${nodeId}',${oi},'replace',this.value);refreshTransformPreview('${nodeId}')"/>
       </div>
     </div>`;
   } else if (op.type==='dateformat') {
-    fields = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
-      <input class="node-input" placeholder="field" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value)"/>
-      <select class="node-select" onchange="updateOp('${nodeId}',${oi},'format',this.value)">
+    fields = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+      <input class="node-input" placeholder="field name" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value);refreshTransformPreview('${nodeId}')"/>
+      <select class="node-select" onchange="updateOp('${nodeId}',${oi},'format',this.value);refreshTransformPreview('${nodeId}')">
         <option ${op.format==='YYYY-MM-DD'?'selected':''} value="YYYY-MM-DD">YYYY-MM-DD</option>
         <option ${op.format==='DD-MM-YYYY'?'selected':''} value="DD-MM-YYYY">DD-MM-YYYY</option>
         <option ${op.format==='DD/MM/YYYY'?'selected':''} value="DD/MM/YYYY">DD/MM/YYYY</option>
-        <option ${op.format==='timestamp'?'selected':''} value="timestamp">Unix timestamp</option>
+        <option ${op.format==='timestamp'?'selected':''}  value="timestamp">Unix timestamp</option>
       </select>
     </div>`;
   }
@@ -2549,6 +2604,7 @@ function addTransformOp(nodeId, type) {
   node.ops.push({type});
   const c = document.getElementById(`ops_${nodeId}`);
   if (c) c.innerHTML = node.ops.map((op,oi)=>renderOpHtml(nodeId,op,oi)).join('');
+  refreshTransformPreview(nodeId);
 }
 
 function removeTransformOp(nodeId, oi) {
@@ -2557,113 +2613,129 @@ function removeTransformOp(nodeId, oi) {
   node.ops.splice(oi,1);
   const c = document.getElementById(`ops_${nodeId}`);
   if (c) c.innerHTML = node.ops.map((op,i)=>renderOpHtml(nodeId,op,i)).join('');
+  refreshTransformPreview(nodeId);
 }
 
 function updateOp(nodeId, oi, key, value) {
   const node = state.editingFlow?.nodes.find(n=>n.id===nodeId);
-  if (node && node.ops[oi]) node.ops[oi][key]=value;
+  if (node && node.ops[oi]) node.ops[oi][key] = value;
 }
 
-function applyTransformPreview(nodeId) {
+function refreshTransformPreview(nodeId) {
   const node = state.editingFlow?.nodes.find(n=>n.id===nodeId);
-  if (!node) return;
-  // Find upstream data
+  const previewEl = document.getElementById(`transform_preview_${nodeId}`);
+  if (!previewEl || !node) return;
   const flow = state.editingFlow;
-  const idx = flow.nodes.findIndex(n=>n.id===nodeId);
-  const prevNode = flow.nodes.slice(0,idx).reverse().find(n=>state.blockDatasets[n.id]);
-  if (!prevNode) { toast('No upstream data found — fetch data from an Extract block first','error'); return; }
-  const input = [...state.blockDatasets[prevNode.id]];
-  const result = applyTransformOps(input, node.ops||[]);
+  const idx  = flow.nodes.findIndex(n=>n.id===nodeId);
+  const upNode = flow.nodes.slice(0,idx).reverse().find(n=>state.blockDatasets[n.id]);
+  if (!upNode) return;
+  const newCols = (node.ops||[]).filter(o=>o.type==='calc').map(o=>o.name).filter(Boolean);
+  const result  = applyTransformOps([...state.blockDatasets[upNode.id]], node.ops||[]);
+  // Store result so block status updates
   state.blockDatasets[nodeId] = result;
   const statusEl = document.querySelector(`#block_${nodeId} .block-status`);
   if (statusEl) { statusEl.textContent=`${result.length} rows`; statusEl.className='block-status ok'; }
-  showRightPanel(node);
-  switchRPTab(nodeId,'data');
-  toast(`Transform applied: ${result.length} rows`, 'success');
+  previewEl.innerHTML = buildPreviewTable(result, newCols);
 }
 
 // ── FIELD MAPPER TAB ──
 function renderFieldMapTab(body, node) {
-  // Left: source columns from upstream dataset
   const flow = state.editingFlow;
-  const idx = flow.nodes.findIndex(n=>n.id===node.id);
-  const prevNode = flow.nodes.slice(0,idx).reverse().find(n=>state.blockDatasets[n.id]);
-  const sourceFields = prevNode ? Object.keys(state.blockDatasets[prevNode.id][0]||{}) : [];
-
-  // Right: AFAS UpdateConnector fields
-  const afasFields = node.afasFields || [];
-
-  // Current mappings
-  const fieldMap = node.fieldMap || [];
+  const idx  = flow.nodes.findIndex(n=>n.id===node.id);
+  // Use sourceNodeId if set, else fall back to last upstream with data
+  const sourceNode = node.sourceNodeId
+    ? flow.nodes.find(n=>n.id===node.sourceNodeId)
+    : flow.nodes.slice(0,idx).reverse().find(n=>state.blockDatasets[n.id]);
+  const sourceDs     = sourceNode ? state.blockDatasets[sourceNode.id] : null;
+  const sourceFields = sourceDs ? Object.keys(sourceDs[0]||{}) : [];
+  const afasFields   = node.afasFields || [];
+  const fieldMap     = node.fieldMap   || [];
+  if (!state.fmapSearch) state.fmapSearch = {left:'', right:''};
+  const lq = state.fmapSearch.left  || '';
+  const rq = state.fmapSearch.right || '';
+  const filtL = sourceFields.filter(f => !lq || f.toLowerCase().includes(lq.toLowerCase()));
+  const filtR = afasFields.filter(f  => !rq || (f.label||f.fieldId).toLowerCase().includes(rq.toLowerCase()) || f.fieldId.toLowerCase().includes(rq.toLowerCase()));
 
   body.innerHTML = `
-    <div style="padding:8px 12px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:11px; color:var(--text2); flex-shrink:0;">
-      <strong style="color:var(--text)">Click a source field</strong>, then <strong style="color:var(--text)">click an AFAS field</strong> to create a mapping. Click a mapping row to delete it.
-      ${!node.connectorId ? '<span style="color:var(--danger); margin-left:8px;">⚠ Select a connector first (Configure tab)</span>' : ''}
-      ${sourceFields.length===0 ? '<span style="color:var(--warn); margin-left:8px;">⚠ No source data — fetch data upstream first</span>' : ''}
+    <div style="padding:7px 12px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:11px; color:var(--text2); display:flex; align-items:center; gap:10px; flex-shrink:0; flex-wrap:wrap;">
+      <span><strong style="color:var(--text);">1.</strong> Click source field &nbsp;<strong style="color:var(--text);">2.</strong> Click AFAS field → mapped</span>
+      ${!node.connectorId ? '<span style="color:var(--danger);">⚠ Select connector first</span>' : ''}
+      ${sourceFields.length===0 ? '<span style="color:var(--warn);">⚠ Fetch source data first</span>' : ''}
+      <span style="margin-left:auto; font-weight:600; color:var(--success);">${fieldMap.filter(m=>m.from).length} / ${afasFields.length} mapped</span>
     </div>
     <div class="field-mapper-wrap" style="flex:1; overflow:hidden;">
 
       <!-- Left: source fields -->
       <div class="fmap-col">
-        <div class="fmap-col-header">Source fields <span style="color:var(--text3);font-weight:400">(${sourceFields.length})</span></div>
-        <div class="fmap-list" id="fmap-left-${node.id}">
-          ${sourceFields.length===0
-            ? '<div class="fmap-hint">Fetch data from an Extract or Transform block first</div>'
-            : sourceFields.map(f => {
-                const isMapped = fieldMap.some(m=>m.from===f);
-                const isSel = state.fmapSelected.left === f;
-                return `<div class="fmap-field${isSel?' selected':''}${isMapped?' mapped':''}" onclick="selectFmapLeft('${node.id}','${f}')">
-                  <span class="fmap-field-name">${f}</span>
-                  ${isMapped?'<span style="color:var(--success);font-size:10px;">✓</span>':''}
+        <div style="padding:0; border-bottom:1px solid var(--border);">
+          <input type="text" value="${lq}" placeholder="Search source fields…"
+            style="width:100%; padding:8px 10px; background:var(--bg3); border:none; color:var(--text); font-size:12px; outline:none; box-sizing:border-box;"
+            oninput="state.fmapSearch.left=this.value; renderFieldMapTab(document.getElementById('rp-body-${node.id}'), state.editingFlow.nodes.find(n=>n.id==='${node.id}'))" />
+        </div>
+        <div style="padding:3px 10px; font-size:10px; color:var(--text3); background:var(--bg2); border-bottom:1px solid var(--border);">
+          ${filtL.length} of ${sourceFields.length} fields${sourceNode ? ` — from <em>${sourceNode.label}</em>` : ''}
+        </div>
+        <div class="fmap-list">
+          ${filtL.length===0
+            ? '<div class="fmap-hint">No fields match</div>'
+            : filtL.map(f => {
+                const mapped = fieldMap.some(m=>m.from===f);
+                const sel    = state.fmapSelected.left === f;
+                return `<div class="fmap-field${sel?' selected':''}${mapped?' mapped':''}" onclick="selectFmapLeft('${node.id}','${f.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
+                  <span style="font-size:12px; font-family:var(--mono);">${f}</span>
+                  ${mapped ? '<span style="color:var(--success);font-size:11px;">✓</span>' : ''}
                 </div>`;
-              }).join('')
-          }
+              }).join('')}
         </div>
       </div>
 
-      <!-- Center: mappings -->
+      <!-- Center: active mappings -->
       <div class="fmap-center">
         <div class="fmap-center-header">
-          Mappings <span style="color:var(--text3);font-weight:400">(${fieldMap.filter(m=>m.from).length})</span>
-          ${fieldMap.some(m=>m.from) ? `<span style="font-size:10px;cursor:pointer;color:var(--danger)" onclick="clearAllMappings('${node.id}')">Clear all</span>` : ''}
+          <span>Mappings (${fieldMap.filter(m=>m.from).length})</span>
+          ${fieldMap.some(m=>m.from) ? `<span style="cursor:pointer;color:var(--danger);font-size:10px;" onclick="clearAllMappings('${node.id}')">Clear all</span>` : ''}
         </div>
-        <div class="fmap-mappings" id="fmap-center-${node.id}">
+        <div class="fmap-mappings">
           ${fieldMap.filter(m=>m.from).length===0
-            ? '<div class="fmap-hint">No mappings yet. Click a source field then an AFAS field to link them.</div>'
-            : fieldMap.filter(m=>m.from).map((m,mi)=>`
-              <div class="fmap-row" title="Click to delete" onclick="removeFmapRow('${node.id}',${fieldMap.indexOf(m)})">
+            ? '<div class="fmap-hint">No mappings yet</div>'
+            : fieldMap.filter(m=>m.from).map(m => `
+              <div class="fmap-row" title="Click to remove" onclick="removeFmapRow('${node.id}',${fieldMap.indexOf(m)})">
                 <span class="fmap-row-from">${m.from}</span>
                 <span class="fmap-row-arrow">→</span>
                 <span class="fmap-row-to">${m.toLabel||m.to}</span>
                 <span class="fmap-row-del">✕</span>
-              </div>`).join('')
-          }
+              </div>`).join('')}
         </div>
       </div>
 
       <!-- Right: AFAS fields -->
       <div class="fmap-col">
-        <div class="fmap-col-header">AFAS fields <span style="color:var(--text3);font-weight:400">(${afasFields.length})</span></div>
-        <div class="fmap-list" id="fmap-right-${node.id}">
-          ${afasFields.length===0
-            ? '<div class="fmap-hint">Select an UpdateConnector in the Configure tab</div>'
-            : afasFields.map(f => {
-                const isMapped = fieldMap.some(m=>m.to===f.fieldId && m.from);
-                const isSel = state.fmapSelected.right === f.fieldId;
-                const typeClass = f.dataType==='string'?'ft-s':f.dataType==='date'?'ft-d':f.dataType==='boolean'?'ft-b':'ft-n';
-                return `<div class="fmap-field${isSel?' selected':''}${isMapped?' mapped':''}" onclick="selectFmapRight('${node.id}','${f.fieldId}','${(f.label||f.fieldId).replace(/'/g,"\\'")}','${f.dataType}')">
+        <div style="padding:0; border-bottom:1px solid var(--border);">
+          <input type="text" value="${rq}" placeholder="Search AFAS fields…"
+            style="width:100%; padding:8px 10px; background:var(--bg3); border:none; color:var(--text); font-size:12px; outline:none; box-sizing:border-box;"
+            oninput="state.fmapSearch.right=this.value; renderFieldMapTab(document.getElementById('rp-body-${node.id}'), state.editingFlow.nodes.find(n=>n.id==='${node.id}'))" />
+        </div>
+        <div style="padding:3px 10px; font-size:10px; color:var(--text3); background:var(--bg2); border-bottom:1px solid var(--border);">
+          ${filtR.length} of ${afasFields.length} AFAS fields
+        </div>
+        <div class="fmap-list">
+          ${filtR.length===0
+            ? '<div class="fmap-hint">No fields match</div>'
+            : filtR.map(f => {
+                const mapped  = fieldMap.some(m=>m.to===f.fieldId && m.from);
+                const sel     = state.fmapSelected.right === f.fieldId;
+                const tcls    = f.dataType==='string'?'ft-s':f.dataType==='date'?'ft-d':f.dataType==='boolean'?'ft-b':'ft-n';
+                return `<div class="fmap-field${sel?' selected':''}${mapped?' mapped':''}" onclick="selectFmapRight('${node.id}','${f.fieldId}','${(f.label||f.fieldId).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}','${f.dataType}')">
                   <div>
-                    <div class="fmap-field-name">${f.label||f.fieldId}${f.mandatory?'<span style="color:var(--danger)"> *</span>':''}</div>
-                    <div class="fmap-field-label">${f.fieldId}</div>
+                    <div style="font-size:12px; font-weight:500;">${f.label||f.fieldId}${f.mandatory?'<span style="color:var(--danger);"> *</span>':''}</div>
+                    <div style="font-size:10px; color:var(--text3); font-family:var(--mono);">${f.fieldId}</div>
                   </div>
                   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
-                    <span class="fmap-field-type ${typeClass}">${f.dataType}</span>
-                    ${isMapped?'<span style="color:var(--success);font-size:10px;">✓</span>':''}
+                    <span class="fmap-field-type ${tcls}">${f.dataType||'str'}</span>
+                    ${mapped ? '<span style="color:var(--success);font-size:10px;">✓</span>' : ''}
                   </div>
                 </div>`;
-              }).join('')
-          }
+              }).join('')}
         </div>
       </div>
     </div>`;
@@ -2690,17 +2762,14 @@ function tryCreateMapping(nodeId, label, type) {
   if (!state.fmapSelected.left || !state.fmapSelected.right) return;
   const node = state.editingFlow?.nodes.find(n=>n.id===nodeId);
   if (!node) return;
-
   node.fieldMap = node.fieldMap || [];
-  // Find existing entry for this AFAS field and update it, or create new
   const existing = node.fieldMap.find(m=>m.to===state.fmapSelected.right);
   if (existing) {
     existing.from = state.fmapSelected.left;
   } else {
     node.fieldMap.push({ from: state.fmapSelected.left, to: state.fmapSelected.right, toLabel: label||state.fmapSelected.right, toType: type||'string' });
   }
-
-  state.fmapSelected.left = null;
+  state.fmapSelected.left  = null;
   state.fmapSelected.right = null;
   renderFieldMapTab(document.getElementById(`rp-body-${nodeId}`), node);
 }
@@ -2709,6 +2778,7 @@ function removeFmapRow(nodeId, mi) {
   const node = state.editingFlow?.nodes.find(n=>n.id===nodeId);
   if (!node) return;
   node.fieldMap[mi].from = '';
+  if (!state.fmapSearch) state.fmapSearch = {left:'', right:''};
   renderFieldMapTab(document.getElementById(`rp-body-${nodeId}`), node);
 }
 
@@ -2719,21 +2789,6 @@ function clearAllMappings(nodeId) {
   renderFieldMapTab(document.getElementById(`rp-body-${nodeId}`), node);
 }
 
-// ═══════════════════════════════════════════════
-// EXECUTION ENGINE
-// ═══════════════════════════════════════════════
-function getFlowEnv() {
-  const flow = state.editingFlow || {};
-  const envId = flow.envId || state.activeEnvId;
-  return state.environments.find(e=>e.id===envId) || null;
-}
-
-function runFlowNow() {
-  if (!state.editingFlow) return;
-  executeFlow(state.editingFlow);
-}
-
-async function runFlowById(id) {
   const flow = state.flows.find(f=>f.id===id);
   if (!flow) return;
   editFlow(id);
