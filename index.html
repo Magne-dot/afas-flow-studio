@@ -1246,12 +1246,19 @@ function selectEnv(id) {
   state.activeEnvId = id;
   save();
   renderEnvironments();
-  updateStatusDot();
   // reset connector state
   state.connectors = { get: [], update: [] };
   state.activeConnector = null;
   renderConnectorList();
-  if (id) loadConnectors();
+  if (id) {
+    // Show loading state immediately
+    document.getElementById('statusDot').className = 'status-dot loading';
+    document.getElementById('statusText').textContent = 'connecting…';
+    loadConnectors();
+  } else {
+    document.getElementById('statusDot').className = 'status-dot';
+    document.getElementById('statusText').textContent = '';
+  }
 }
 
 function updateStatusDot() {
@@ -1409,8 +1416,13 @@ async function loadConnectors() {
     state.connectors.get = meta.getConnectors || [];
     state.connectors.update = meta.updateConnectors || [];
     renderConnectorList();
+    // Update status dot
+    document.getElementById('statusDot').className = 'status-dot ok';
+    document.getElementById('statusText').textContent = 'connected';
     toast(`Loaded ${state.connectors.get.length} Get + ${state.connectors.update.length} Update connectors`, 'success');
   } catch(e) {
+    document.getElementById('statusDot').className = 'status-dot err';
+    document.getElementById('statusText').textContent = 'error';
     listEl.innerHTML = `<div class="empty-state" style="height:200px"><div class="empty-icon">⚠️</div><div class="empty-title">Failed to load</div><div class="empty-sub">${e.message}</div></div>`;
   }
 }
@@ -1735,3 +1747,4 @@ if (state.activeEnvId && state.proxyUrl) {
 </script>
 </body>
 </html>
+
