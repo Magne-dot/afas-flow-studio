@@ -856,9 +856,11 @@
   .node-field label { font-size:11px; color:var(--text2); }
   .node-select, .node-input {
     background:var(--bg3); border:1px solid var(--border); color:var(--text);
-    font-family:var(--mono); font-size:11px; padding:5px 8px; border-radius:4px; outline:none; width:100%;
+    font-family:var(--sans); font-size:12px; padding:5px 8px; border-radius:4px; outline:none; width:100%;
+    box-sizing:border-box;
   }
   .node-select:focus, .node-input:focus { border-color:var(--accent); }
+  textarea.node-input { font-family:var(--mono) !important; font-size:11px; line-height:1.6; }
 
   /* transform ops */
   .transform-op { background:var(--bg3); border:1px solid var(--border); border-radius:5px; padding:8px; margin-bottom:6px; position:relative; }
@@ -2346,32 +2348,43 @@ function renderConfigTab(body, node) {
   else if (node.type === 'transform') {
     const ops = node.ops || [];
     const opsHtml = ops.map((op,oi) => renderOpHtml(node.id, op, oi)).join('');
-    // find upstream dataset for live preview
-    const flow2 = state.editingFlow;
-    const tidx  = flow2.nodes.findIndex(n=>n.id===node.id);
+    const flow2  = state.editingFlow;
+    const tidx   = flow2.nodes.findIndex(n=>n.id===node.id);
     const upNode = flow2.nodes.slice(0,tidx).reverse().find(n=>state.blockDatasets[n.id]);
     const upDs   = upNode ? state.blockDatasets[upNode.id] : null;
+    // Only auto-run if data exists
     const previewHtml = upDs
       ? buildPreviewTable(applyTransformOps([...upDs], ops), ops.filter(o=>o.type==='calc').map(o=>o.name).filter(Boolean))
-      : `<div style="padding:20px; text-align:center; font-size:12px; color:var(--text3);">Fetch data from an Extract block above to see live preview here</div>`;
+      : `<div class="empty-state" style="height:100%;"><div class="empty-icon">▶</div><div class="empty-title">No data</div><div class="empty-sub">Fetch data from an Extract block, then click Run to preview</div></div>`;
     body.innerHTML = `<div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
-      <div style="padding:12px 16px; overflow-y:auto; flex-shrink:0; max-height:50%; border-bottom:1px solid var(--border);">
-        <div class="config-section">
-          <div class="config-section-title">Operations <span style="font-weight:400;color:var(--text3)">(applied in order)</span></div>
-          <div id="ops_${node.id}">${opsHtml}</div>
-          <select class="node-select" style="margin-top:8px;" onchange="addTransformOp('${node.id}',this.value);this.value='';">
-            <option value="">+ Add operation…</option>
-            <option value="filter">Filter rows</option>
-            <option value="rename">Rename field</option>
-            <option value="calc">Calculated column</option>
-            <option value="replace">Find &amp; replace</option>
-            <option value="dateformat">Date format</option>
-          </select>
+
+      <!-- Ops panel: takes 60% of height, scrollable -->
+      <div style="flex:0 0 60%; min-height:0; display:flex; flex-direction:column; border-bottom:2px solid var(--border);">
+        <div style="padding:8px 14px; background:var(--bg2); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+          <span style="font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.06em;">Operations</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <select class="node-select" style="font-size:11px; padding:3px 6px; width:auto;" onchange="addTransformOp('${node.id}',this.value);this.value='';">
+              <option value="">+ Add…</option>
+              <option value="filter">Filter rows</option>
+              <option value="rename">Rename field</option>
+              <option value="calc">Calculated column</option>
+              <option value="replace">Find &amp; replace</option>
+              <option value="dateformat">Date format</option>
+            </select>
+            <button onclick="runTransformPreview('${node.id}')" style="padding:4px 14px; border-radius:5px; border:1px solid var(--success); background:rgba(62,207,142,.1); color:var(--success); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all .15s;" onmouseover="this.style.background='rgba(62,207,142,.2)'" onmouseout="this.style.background='rgba(62,207,142,.1)'">▶ Run</button>
+          </div>
+        </div>
+        <div style="flex:1; overflow-y:auto; padding:10px 14px;" id="ops_scroll_${node.id}">
+          <div id="ops_${node.id}">${opsHtml || '<div style="color:var(--text3);font-size:12px;padding:8px 0;">No operations yet — add one above</div>'}</div>
         </div>
       </div>
-      <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+
+      <!-- Preview panel: takes remaining 40% -->
+      <div style="flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden;">
         <div style="padding:6px 14px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:11px; font-weight:600; color:var(--text3); display:flex; align-items:center; gap:8px; flex-shrink:0; text-transform:uppercase; letter-spacing:.06em;">
-          Live preview ${upDs ? `<span style="font-weight:400;color:var(--text2);text-transform:none;">— from <em>${upNode.label}</em></span>` : ''}
+          Result preview
+          ${upDs ? `<span style="font-weight:400;color:var(--text2);text-transform:none;font-size:11px;">from <em>${upNode.label}</em> · ${upDs.length} rows in</span>` : '<span style="font-weight:400;color:var(--text3);text-transform:none;">no source data</span>'}
+          ${state.blockDatasets[node.id] ? `<span style="margin-left:auto; color:var(--success); font-weight:600;">${state.blockDatasets[node.id].length} rows out</span>` : ''}
         </div>
         <div id="transform_preview_${node.id}" style="flex:1; overflow:hidden; display:flex; flex-direction:column;">
           ${previewHtml}
@@ -2545,52 +2558,113 @@ function renderOpHtml(nodeId, op, oi) {
   const labels = { filter:'Filter rows', rename:'Rename field', calc:'Calculated column', replace:'Find & replace', dateformat:'Date format' };
   let fields = '';
   if (op.type==='filter') {
-    fields = `<div style="display:grid;grid-template-columns:1fr 90px 1fr;gap:4px;align-items:center;">
-      <input class="node-input" placeholder="field name" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value);refreshTransformPreview('${nodeId}')"/>
-      <select class="node-select" onchange="updateOp('${nodeId}',${oi},'op',this.value);refreshTransformPreview('${nodeId}')">
+    fields = `<div style="display:grid;grid-template-columns:1fr 100px 1fr;gap:5px;align-items:center;">
+      <input class="node-input" placeholder="field name" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value)"/>
+      <select class="node-select" onchange="updateOp('${nodeId}',${oi},'op',this.value)">
         <option ${op.op==='eq'      ?'selected':''} value="eq">= equals</option>
         <option ${op.op==='neq'     ?'selected':''} value="neq">≠ not equals</option>
-        <option ${op.op==='gt'      ?'selected':''} value="gt">&gt; greater</option>
-        <option ${op.op==='lt'      ?'selected':''} value="lt">&lt; less</option>
+        <option ${op.op==='gt'      ?'selected':''} value="gt">&gt; greater than</option>
+        <option ${op.op==='gte'     ?'selected':''} value="gte">≥ greater/equal</option>
+        <option ${op.op==='lt'      ?'selected':''} value="lt">&lt; less than</option>
+        <option ${op.op==='lte'     ?'selected':''} value="lte">≤ less/equal</option>
         <option ${op.op==='contains'?'selected':''} value="contains">contains</option>
+        <option ${op.op==='startswith'?'selected':''} value="startswith">starts with</option>
+        <option ${op.op==='endswith'?'selected':''} value="endswith">ends with</option>
         <option ${op.op==='notempty'?'selected':''} value="notempty">not empty</option>
+        <option ${op.op==='isempty' ?'selected':''} value="isempty">is empty</option>
       </select>
-      <input class="node-input" placeholder="value" value="${op.value||''}" oninput="updateOp('${nodeId}',${oi},'value',this.value);refreshTransformPreview('${nodeId}')"/>
+      <input class="node-input" placeholder="value" value="${op.value||''}" oninput="updateOp('${nodeId}',${oi},'value',this.value)"/>
     </div>`;
   } else if (op.type==='rename') {
-    fields = `<div style="display:grid;grid-template-columns:1fr 24px 1fr;gap:4px;align-items:center;">
-      <input class="node-input" placeholder="from field" value="${op.from||''}" oninput="updateOp('${nodeId}',${oi},'from',this.value);refreshTransformPreview('${nodeId}')"/>
-      <span style="text-align:center;color:var(--text3);font-size:14px;">→</span>
-      <input class="node-input" placeholder="to field" value="${op.to||''}" oninput="updateOp('${nodeId}',${oi},'to',this.value);refreshTransformPreview('${nodeId}')"/>
+    fields = `<div style="display:grid;grid-template-columns:1fr 28px 1fr;gap:5px;align-items:center;">
+      <input class="node-input" placeholder="from field" value="${op.from||''}" oninput="updateOp('${nodeId}',${oi},'from',this.value)"/>
+      <span style="text-align:center;color:var(--text3);font-size:16px;">→</span>
+      <input class="node-input" placeholder="to field" value="${op.to||''}" oninput="updateOp('${nodeId}',${oi},'to',this.value)"/>
     </div>`;
   } else if (op.type==='calc') {
-    fields = `<div style="display:flex;flex-direction:column;gap:5px;">
-      <input class="node-input" placeholder="new column name" value="${op.name||''}" oninput="updateOp('${nodeId}',${oi},'name',this.value);refreshTransformPreview('${nodeId}')"/>
-      <input class="node-input" placeholder="formula e.g. {Uren} * {Tarief}" value="${op.formula||''}" oninput="updateOp('${nodeId}',${oi},'formula',this.value);refreshTransformPreview('${nodeId}')" style="font-family:var(--mono);font-size:11px;"/>
-      <div style="font-size:10px;color:var(--text3);">Use {fieldName} to reference columns. Supports +, -, *, /, Math.round(), etc.</div>
+    const formulaId = `formula_${nodeId}_${oi}`;
+    fields = `<div style="display:flex;flex-direction:column;gap:6px;">
+      <input class="node-input" placeholder="New column name" value="${op.name||''}" oninput="updateOp('${nodeId}',${oi},'name',this.value)" style="font-weight:500;"/>
+      <div style="display:flex;gap:4px;align-items:flex-start;">
+        <textarea id="${formulaId}" class="node-input" rows="2" placeholder="e.g.  IF({Status}='A', {Uren}*{Tarief}, 0)" style="font-family:var(--mono);font-size:11px;resize:vertical;flex:1;line-height:1.5;" oninput="updateOp('${nodeId}',${oi},'formula',this.value)">${op.formula||''}</textarea>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:10px;color:var(--text3);margin-right:2px;">Insert:</span>
+        <select class="node-select" style="font-size:10px;padding:2px 4px;width:auto;" onchange="insertExcelFormula('${formulaId}','${nodeId}',${oi},this.value);this.value='';">
+          <option value="">Excel functions…</option>
+          <optgroup label="Logic">
+            <option value="IF({field}, value_if_true, value_if_false)">IF</option>
+            <option value="AND({field1}, {field2})">AND</option>
+            <option value="OR({field1}, {field2})">OR</option>
+            <option value="NOT({field})">NOT</option>
+            <option value="({field} == null || {field} === '') ? '' : {field}">IFBLANK</option>
+          </optgroup>
+          <optgroup label="Math">
+            <option value="Math.round({field})">ROUND</option>
+            <option value="Math.round({field} * 100) / 100">ROUND(2 dec)</option>
+            <option value="Math.floor({field})">ROUNDDOWN</option>
+            <option value="Math.ceil({field})">ROUNDUP</option>
+            <option value="Math.abs({field})">ABS</option>
+            <option value="Math.max({field1}, {field2})">MAX</option>
+            <option value="Math.min({field1}, {field2})">MIN</option>
+            <option value="{field1} + {field2}">SUM two fields</option>
+            <option value="{field} * {factor}">MULTIPLY</option>
+            <option value="({field} / {total}) * 100">PERCENTAGE</option>
+          </optgroup>
+          <optgroup label="Text">
+            <option value="String({field}).toUpperCase()">UPPER</option>
+            <option value="String({field}).toLowerCase()">LOWER</option>
+            <option value="String({field}).trim()">TRIM</option>
+            <option value="String({field}).slice(0, {n})">LEFT(n chars)</option>
+            <option value="String({field}).slice(-{n})">RIGHT(n chars)</option>
+            <option value="String({field}).slice({start}, {end})">MID</option>
+            <option value="String({field}).length">LEN</option>
+            <option value="String({field1}) + ' ' + String({field2})">CONCAT</option>
+            <option value="String({field}).replace({find}, {replace})">SUBSTITUTE</option>
+            <option value="String({field}).split('-')[0]">SPLIT (get part)</option>
+            <option value="String({field}).padStart(6, '0')">LPAD zeros</option>
+          </optgroup>
+          <optgroup label="Date">
+            <option value="new Date({field}).getFullYear()">YEAR</option>
+            <option value="new Date({field}).getMonth() + 1">MONTH</option>
+            <option value="new Date({field}).getDate()">DAY</option>
+            <option value="new Date({field}).toISOString().slice(0,10)">DATE to YYYY-MM-DD</option>
+            <option value="Math.floor((new Date() - new Date({field})) / 86400000)">DAYS since date</option>
+            <option value="new Date(new Date({field}).setDate(new Date({field}).getDate() + {n})).toISOString().slice(0,10)">DATE + n days</option>
+          </optgroup>
+          <optgroup label="Type convert">
+            <option value="Number({field})">TO NUMBER</option>
+            <option value="String({field})">TO TEXT</option>
+            <option value="{field} === 'true' || {field} === true || {field} === 1">TO BOOLEAN</option>
+            <option value="({field} || '').toString().replace(',','.')">COMMA to DOT</option>
+          </optgroup>
+        </select>
+      </div>
+      <div style="font-size:10px;color:var(--text3);line-height:1.5;">Use <code style="background:var(--bg3);padding:1px 4px;border-radius:3px;">{FieldName}</code> to reference columns. Standard JavaScript expressions supported.</div>
     </div>`;
   } else if (op.type==='replace') {
     fields = `<div style="display:flex;flex-direction:column;gap:5px;">
-      <input class="node-input" placeholder="field name" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value);refreshTransformPreview('${nodeId}')"/>
-      <div style="display:grid;grid-template-columns:1fr 24px 1fr;gap:4px;align-items:center;">
-        <input class="node-input" placeholder="find text" value="${op.find||''}" oninput="updateOp('${nodeId}',${oi},'find',this.value);refreshTransformPreview('${nodeId}')"/>
-        <span style="text-align:center;color:var(--text3);font-size:14px;">→</span>
-        <input class="node-input" placeholder="replace with" value="${op.replace||''}" oninput="updateOp('${nodeId}',${oi},'replace',this.value);refreshTransformPreview('${nodeId}')"/>
+      <input class="node-input" placeholder="field name" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value)"/>
+      <div style="display:grid;grid-template-columns:1fr 28px 1fr;gap:5px;align-items:center;">
+        <input class="node-input" placeholder="find text" value="${op.find||''}" oninput="updateOp('${nodeId}',${oi},'find',this.value)"/>
+        <span style="text-align:center;color:var(--text3);font-size:16px;">→</span>
+        <input class="node-input" placeholder="replace with" value="${op.replace||''}" oninput="updateOp('${nodeId}',${oi},'replace',this.value)"/>
       </div>
     </div>`;
   } else if (op.type==='dateformat') {
     fields = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
-      <input class="node-input" placeholder="field name" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value);refreshTransformPreview('${nodeId}')"/>
-      <select class="node-select" onchange="updateOp('${nodeId}',${oi},'format',this.value);refreshTransformPreview('${nodeId}')">
+      <input class="node-input" placeholder="field name" value="${op.field||''}" oninput="updateOp('${nodeId}',${oi},'field',this.value)"/>
+      <select class="node-select" onchange="updateOp('${nodeId}',${oi},'format',this.value)">
         <option ${op.format==='YYYY-MM-DD'?'selected':''} value="YYYY-MM-DD">YYYY-MM-DD</option>
         <option ${op.format==='DD-MM-YYYY'?'selected':''} value="DD-MM-YYYY">DD-MM-YYYY</option>
         <option ${op.format==='DD/MM/YYYY'?'selected':''} value="DD/MM/YYYY">DD/MM/YYYY</option>
+        <option ${op.format==='MM/DD/YYYY'?'selected':''} value="MM/DD/YYYY">MM/DD/YYYY</option>
         <option ${op.format==='timestamp'?'selected':''}  value="timestamp">Unix timestamp</option>
       </select>
     </div>`;
   }
   return `<div class="transform-op">
-    <div class="transform-op-type">${icons[op.type]} ${labels[op.type]}</div>
+    <div class="transform-op-type">${icons[op.type]} ${labels[op.type]}<span style="margin-left:auto;font-size:10px;color:var(--text3);font-weight:400;">#${oi+1}</span></div>
     <span class="remove-op" onclick="removeTransformOp('${nodeId}',${oi})">✕</span>
     ${fields}
   </div>`;
@@ -2619,6 +2693,54 @@ function removeTransformOp(nodeId, oi) {
 function updateOp(nodeId, oi, key, value) {
   const node = state.editingFlow?.nodes.find(n=>n.id===nodeId);
   if (node && node.ops[oi]) node.ops[oi][key] = value;
+}
+
+function insertExcelFormula(textareaId, nodeId, oi, template) {
+  if (!template) return;
+  const ta = document.getElementById(textareaId);
+  if (!ta) return;
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const current = ta.value;
+  const insert = current.slice(0,start) + template + current.slice(end);
+  ta.value = insert;
+  // Put cursor inside first placeholder
+  const firstPlaceholder = insert.indexOf('{', start);
+  const firstClose = firstPlaceholder > -1 ? insert.indexOf('}', firstPlaceholder) : -1;
+  if (firstPlaceholder > -1 && firstClose > -1) {
+    ta.setSelectionRange(firstPlaceholder, firstClose+1);
+  } else {
+    ta.setSelectionRange(start + template.length, start + template.length);
+  }
+  ta.focus();
+  updateOp(nodeId, oi, 'formula', insert);
+}
+
+function runTransformPreview(nodeId) {
+  const node = state.editingFlow?.nodes.find(n=>n.id===nodeId);
+  if (!node) return;
+  const flow = state.editingFlow;
+  const idx  = flow.nodes.findIndex(n=>n.id===nodeId);
+  const upNode = flow.nodes.slice(0,idx).reverse().find(n=>state.blockDatasets[n.id]);
+  if (!upNode) { toast('No upstream data — fetch from an Extract block first', 'error'); return; }
+  const newCols = (node.ops||[]).filter(o=>o.type==='calc').map(o=>o.name).filter(Boolean);
+  let result;
+  try {
+    result = applyTransformOps([...state.blockDatasets[upNode.id]], node.ops||[]);
+  } catch(e) {
+    toast('Transform error: ' + e.message, 'error'); return;
+  }
+  state.blockDatasets[nodeId] = result;
+  const statusEl = document.querySelector(`#block_${nodeId} .block-status`);
+  if (statusEl) { statusEl.textContent=`${result.length} rows`; statusEl.className='block-status ok'; }
+  const previewEl = document.getElementById(`transform_preview_${nodeId}`);
+  if (previewEl) previewEl.innerHTML = buildPreviewTable(result, newCols);
+  // Update row count in preview header
+  const body = document.getElementById(`rp-body-${nodeId}`);
+  if (body) {
+    const outSpan = body.querySelector('.rows-out-badge');
+    if (outSpan) outSpan.textContent = result.length + ' rows out';
+  }
+  toast(`▶ Transform ran: ${result.length} rows`, 'success');
 }
 
 function refreshTransformPreview(nodeId) {
@@ -2803,45 +2925,113 @@ function log(msg, type='info') {
 
 function applyTransformOps(rows, ops) {
   for (const op of ops) {
+
     if (op.type==='filter') {
       rows = rows.filter(row => {
-        const v = String(row[op.field]??''), c=String(op.value??'');
-        if (op.op==='eq') return v===c;
-        if (op.op==='neq') return v!==c;
-        if (op.op==='gt') return parseFloat(v)>parseFloat(c);
-        if (op.op==='lt') return parseFloat(v)<parseFloat(c);
-        if (op.op==='contains') return v.toLowerCase().includes(c.toLowerCase());
-        if (op.op==='notempty') return v!==''&&v!=='null'&&v!=='undefined';
-        return true;
+        const raw = row[op.field];
+        const v   = String(raw ?? '');
+        const c   = String(op.value ?? '');
+        const vn  = parseFloat(v), cn = parseFloat(c);
+        switch (op.op) {
+          case 'eq':         return v === c;
+          case 'neq':        return v !== c;
+          case 'gt':         return vn > cn;
+          case 'gte':        return vn >= cn;
+          case 'lt':         return vn < cn;
+          case 'lte':        return vn <= cn;
+          case 'contains':   return v.toLowerCase().includes(c.toLowerCase());
+          case 'startswith': return v.toLowerCase().startsWith(c.toLowerCase());
+          case 'endswith':   return v.toLowerCase().endsWith(c.toLowerCase());
+          case 'notempty':   return raw !== null && raw !== undefined && v !== '' && v !== 'null';
+          case 'isempty':    return raw === null || raw === undefined || v === '' || v === 'null';
+          default:           return true;
+        }
       });
+
     } else if (op.type==='rename') {
-      rows = rows.map(row => { const r={...row}; if(op.from in r){r[op.to]=r[op.from];delete r[op.from];} return r; });
-    } else if (op.type==='calc') {
       rows = rows.map(row => {
-        const r={...row};
-        try {
-          const formula = (op.formula||'').replace(/\{(\w+)\}/g, (_,f) => {
-            const v=row[f]; return isNaN(v)?JSON.stringify(v):v;
-          });
-          r[op.name] = Function('"use strict";return('+formula+')')();
-        } catch(e) { r[op.name]=null; }
+        const r = {...row};
+        if (op.from && op.from in r) { r[op.to || op.from] = r[op.from]; delete r[op.from]; }
         return r;
       });
+
+    } else if (op.type==='calc') {
+      rows = rows.map(row => {
+        const r = {...row};
+        if (!op.name || !op.formula) return r;
+        try {
+          // Replace {FieldName} with actual values, string-quoted if non-numeric
+          const formula = op.formula.replace(/\{([\w\s]+)\}/g, (_, f) => {
+            const v = row[f.trim()];
+            if (v === null || v === undefined) return 'null';
+            if (typeof v === 'boolean') return v;
+            if (!isNaN(v) && v !== '') return Number(v);
+            return JSON.stringify(String(v));
+          });
+          // Expose Excel-like helpers in scope
+          const IF = (cond, t, f) => cond ? t : f;
+          const AND = (...args) => args.every(Boolean);
+          const OR  = (...args) => args.some(Boolean);
+          const NOT = (v) => !v;
+          const ROUND   = (v, d=0) => Math.round(v * Math.pow(10,d)) / Math.pow(10,d);
+          const ROUNDUP = (v) => Math.ceil(v);
+          const ROUNDDOWN = (v) => Math.floor(v);
+          const ABS     = (v) => Math.abs(v);
+          const MAX     = Math.max;
+          const MIN     = Math.min;
+          const UPPER   = (v) => String(v).toUpperCase();
+          const LOWER   = (v) => String(v).toLowerCase();
+          const TRIM    = (v) => String(v).trim();
+          const LEN     = (v) => String(v).length;
+          const LEFT    = (v, n) => String(v).slice(0, n);
+          const RIGHT   = (v, n) => String(v).slice(-n);
+          const MID     = (v, s, e) => String(v).slice(s, e);
+          const CONCAT  = (...args) => args.map(String).join('');
+          const TEXT    = (v) => String(v);
+          const VALUE   = (v) => Number(v);
+          const YEAR    = (v) => new Date(v).getFullYear();
+          const MONTH   = (v) => new Date(v).getMonth() + 1;
+          const DAY     = (v) => new Date(v).getDate();
+          const TODAY   = () => new Date().toISOString().slice(0,10);
+          const NOW     = () => new Date().toISOString();
+          r[op.name] = Function(
+            '"use strict";',
+            'var IF=arguments[0],AND=arguments[1],OR=arguments[2],NOT=arguments[3],' +
+            'ROUND=arguments[4],ROUNDUP=arguments[5],ROUNDDOWN=arguments[6],ABS=arguments[7],' +
+            'MAX=arguments[8],MIN=arguments[9],UPPER=arguments[10],LOWER=arguments[11],' +
+            'TRIM=arguments[12],LEN=arguments[13],LEFT=arguments[14],RIGHT=arguments[15],' +
+            'MID=arguments[16],CONCAT=arguments[17],TEXT=arguments[18],VALUE=arguments[19],' +
+            'YEAR=arguments[20],MONTH=arguments[21],DAY=arguments[22],TODAY=arguments[23],NOW=arguments[24];',
+            'return (' + formula + ');'
+          )(IF,AND,OR,NOT,ROUND,ROUNDUP,ROUNDDOWN,ABS,MAX,MIN,UPPER,LOWER,TRIM,LEN,LEFT,RIGHT,MID,CONCAT,TEXT,VALUE,YEAR,MONTH,DAY,TODAY,NOW);
+        } catch(e) { r[op.name] = '#ERR: ' + e.message.slice(0,40); }
+        return r;
+      });
+
     } else if (op.type==='replace') {
-      rows = rows.map(row => { const r={...row}; if(r[op.field]!==undefined)r[op.field]=String(r[op.field]).split(op.find||'').join(op.replace||''); return r; });
+      rows = rows.map(row => {
+        const r = {...row};
+        if (r[op.field] !== undefined) r[op.field] = String(r[op.field]).split(op.find||'').join(op.replace||'');
+        return r;
+      });
+
     } else if (op.type==='dateformat') {
       rows = rows.map(row => {
-        const r={...row};
-        if (r[op.field]) { try {
-          const d=new Date(r[op.field]); if(!isNaN(d)) {
-            const p=n=>String(n).padStart(2,'0');
-            const fmt=op.format||'YYYY-MM-DD';
-            if(fmt==='YYYY-MM-DD') r[op.field]=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
-            else if(fmt==='DD-MM-YYYY') r[op.field]=`${p(d.getDate())}-${p(d.getMonth()+1)}-${d.getFullYear()}`;
-            else if(fmt==='DD/MM/YYYY') r[op.field]=`${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()}`;
-            else if(fmt==='timestamp') r[op.field]=d.getTime();
-          }
-        } catch(e){} }
+        const r = {...row};
+        if (r[op.field]) {
+          try {
+            const d = new Date(r[op.field]);
+            if (!isNaN(d)) {
+              const p = n => String(n).padStart(2,'0');
+              const fmt = op.format || 'YYYY-MM-DD';
+              if      (fmt==='YYYY-MM-DD') r[op.field] = `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+              else if (fmt==='DD-MM-YYYY') r[op.field] = `${p(d.getDate())}-${p(d.getMonth()+1)}-${d.getFullYear()}`;
+              else if (fmt==='DD/MM/YYYY') r[op.field] = `${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()}`;
+              else if (fmt==='MM/DD/YYYY') r[op.field] = `${p(d.getMonth()+1)}/${p(d.getDate())}/${d.getFullYear()}`;
+              else if (fmt==='timestamp')  r[op.field] = d.getTime();
+            }
+          } catch(e) {}
+        }
         return r;
       });
     }
