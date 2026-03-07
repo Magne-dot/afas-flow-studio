@@ -2789,12 +2789,6 @@ function clearAllMappings(nodeId) {
   renderFieldMapTab(document.getElementById(`rp-body-${nodeId}`), node);
 }
 
-  const flow = state.flows.find(f=>f.id===id);
-  if (!flow) return;
-  editFlow(id);
-  setTimeout(() => executeFlow(state.editingFlow), 200);
-}
-
 function log(msg, type='info') {
   const bar = document.getElementById('runLogBar');
   const content = document.getElementById('runLogContent');
@@ -2882,8 +2876,10 @@ async function executeFlow(flow) {
 
       else if (node.type==='join') {
         const extracts = flow.nodes.filter(n=>n.type==='extract');
-        const left = datasets[extracts[0]?.id]||[];
-        const right = datasets[extracts[1]?.id]||[];
+        const leftNode  = node.leftNodeId  ? flow.nodes.find(n=>n.id===node.leftNodeId)  : extracts[0];
+        const rightNode = node.rightNodeId ? flow.nodes.find(n=>n.id===node.rightNodeId) : extracts[1];
+        const left  = datasets[leftNode?.id]  || [];
+        const right = datasets[rightNode?.id] || [];
         log(`Join: ${node.joinType} on [${node.leftField}]=[${node.rightField}] (${left.length}×${right.length})`, 'info');
         const ri = {}; right.forEach(r=>{ if(r[node.rightField]!==undefined) ri[r[node.rightField]]=r; });
         const joined = node.joinType==='INNER'
@@ -2908,8 +2904,11 @@ async function executeFlow(flow) {
 
       else if (node.type==='load') {
         if (!node.connectorId) { log('Load: no connector — skip','warn'); continue; }
-        const prevNode = flow.nodes[flow.nodes.indexOf(node)-1];
-        const input = prevNode ? (datasets[prevNode.id]||[]) : [];
+        const loadIdx = flow.nodes.indexOf(node);
+        const sourceNode = node.sourceNodeId
+          ? flow.nodes.find(n=>n.id===node.sourceNodeId)
+          : flow.nodes[loadIdx-1];
+        const input = sourceNode ? (datasets[sourceNode.id]||[]) : [];
         const fieldMap = (node.fieldMap||[]).filter(m=>m.from);
         log(`Load: sending ${input.length} rows to ${node.connectorId} (${fieldMap.length} fields mapped)…`, 'info');
         let ok=0, err=0;
@@ -2940,6 +2939,27 @@ async function executeFlow(flow) {
   }
 }
 
+
+// ═══════════════════════════════════════════════
+// RUN ENGINE
+// ═══════════════════════════════════════════════
+function getFlowEnv() {
+  const flow = state.editingFlow || {};
+  const envId = flow.envId || state.activeEnvId;
+  return state.environments.find(e=>e.id===envId) || null;
+}
+
+function runFlowNow() {
+  if (!state.editingFlow) return;
+  executeFlow(state.editingFlow);
+}
+
+async function runFlowById(id) {
+  const flow = state.flows.find(f=>f.id===id);
+  if (!flow) return;
+  editFlow(id);
+  setTimeout(() => executeFlow(state.editingFlow), 200);
+}
 
 // If active env already selected, auto-connect
 if (state.activeEnvId && state.proxyUrl) {
