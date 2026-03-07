@@ -750,198 +750,182 @@
   .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
   .section-header { font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; padding: 8px 10px 4px; }
-
-  /* ── FLOW BUILDER ── */
-  .flow-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 14px;
-  }
-  .flow-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
-    cursor: pointer;
-    transition: border-color 0.15s;
-  }
-  .flow-card:hover { border-color: var(--accent); }
+  /* ── FLOW LIST ── */
+  .flow-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+  .flow-card { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:16px; transition:border-color .15s; }
+  .flow-card:hover { border-color:var(--accent); }
   .flow-card-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
   .flow-card-name { font-weight:600; font-size:14px; }
-  .flow-schedule-badge {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 2px 7px;
-    border-radius: 3px;
-    background: rgba(79,142,247,0.12);
-    color: var(--accent);
-    border: 1px solid rgba(79,142,247,0.25);
-  }
-  .flow-schedule-badge.manual {
-    background: rgba(74,85,107,0.2);
-    color: var(--text3);
-    border-color: var(--border);
-  }
+  .flow-sched-badge { font-family:var(--mono); font-size:10px; padding:2px 7px; border-radius:3px; }
+  .flow-sched-badge.has-sched { background:rgba(79,142,247,.12); color:var(--accent); border:1px solid rgba(79,142,247,.25); }
+  .flow-sched-badge.no-sched  { background:rgba(74,85,107,.2); color:var(--text3); border:1px solid var(--border); }
   .flow-meta { font-size:12px; color:var(--text2); line-height:1.8; font-family:var(--mono); }
   .flow-meta span { color:var(--text3); }
-  .flow-pipeline {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin: 10px 0;
-    flex-wrap: wrap;
-  }
-  .flow-node-pill {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-family: var(--mono);
-  }
-  .pill-extract { background:rgba(79,142,247,0.15); color:var(--accent); }
-  .pill-join    { background:rgba(167,139,250,0.15); color:#a78bfa; }
-  .pill-transform { background:rgba(245,166,35,0.15); color:var(--warn); }
-  .pill-load    { background:rgba(62,207,142,0.15); color:var(--success); }
-  .pill-arrow   { color:var(--text3); font-size:10px; }
-
-  .flow-last-run { font-size:11px; color:var(--text3); margin-top:8px; padding-top:8px; border-top:1px solid var(--border); display:flex; align-items:center; gap:6px; }
-  .run-ok  { color:var(--success); }
-  .run-err { color:var(--danger); }
-  .run-never { color:var(--text3); }
-
+  .flow-pipeline { display:flex; align-items:center; gap:4px; margin:8px 0; flex-wrap:wrap; }
+  .fpill { font-size:10px; padding:2px 8px; border-radius:10px; font-weight:600; font-family:var(--mono); }
+  .fpill-extract   { background:rgba(79,142,247,.15);  color:var(--accent); }
+  .fpill-join      { background:rgba(167,139,250,.15); color:#a78bfa; }
+  .fpill-transform { background:rgba(245,166,35,.15);  color:var(--warn); }
+  .fpill-load      { background:rgba(62,207,142,.15);  color:var(--success); }
+  .fpill-arrow     { color:var(--text3); font-size:10px; }
+  .flow-last-run { font-size:11px; color:var(--text3); margin-top:8px; padding-top:8px; border-top:1px solid var(--border); }
   .flow-actions { display:flex; gap:6px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
 
-  /* ── CANVAS NODES ── */
-  .palette-node {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--bg3);
-    cursor: pointer;
-    transition: all 0.15s;
+  /* ── PIPELINE BLOCKS ── */
+  .add-block-btn {
+    font-size:11px; font-weight:600; font-family:var(--sans);
+    padding:5px 12px; border-radius:5px; border:1px solid var(--border);
+    cursor:pointer; transition:all .15s; background:var(--bg3); color:var(--text2);
+    display:inline-flex; align-items:center; gap:5px;
   }
-  .palette-node:hover { border-color: var(--accent); background: rgba(79,142,247,0.06); }
+  .add-block-btn:hover { color:var(--text); background:var(--bg2); border-color:var(--text2); }
 
-  .node-type-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
+  .pipeline-connector {
+    display:flex; align-items:center; justify-content:center;
+    height:28px; color:var(--text3); font-size:16px; position:relative;
   }
-
-  .canvas-node {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    width: 260px;
-    flex-shrink: 0;
-    transition: border-color 0.15s;
-    position: relative;
+  .pipeline-connector::before {
+    content:''; position:absolute; top:0; bottom:0; left:50%;
+    width:2px; background:var(--border); transform:translateX(-50%); z-index:0;
   }
-  .canvas-node:hover { border-color: rgba(79,142,247,0.5); }
-  .canvas-node.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(79,142,247,0.15); }
+  .pipeline-connector span { background:var(--bg); padding:0 6px; z-index:1; position:relative; }
 
-  .canvas-node-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
+  .block-card {
+    background:var(--bg2); border:1px solid var(--border); border-radius:8px;
+    overflow:hidden; transition:border-color .15s; flex-shrink:0;
   }
-  .canvas-node-type {
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-family: var(--mono);
-    letter-spacing: .04em;
+  .block-card:hover { border-color:rgba(79,142,247,.4); }
+  .block-card.active { border-color:var(--accent); }
+
+  .block-header {
+    display:flex; align-items:center; gap:10px; padding:12px 14px;
+    cursor:pointer; transition:background .15s;
   }
-  .cnt-extract   { background:rgba(79,142,247,0.2); color:var(--accent); }
-  .cnt-join      { background:rgba(167,139,250,0.2); color:#a78bfa; }
-  .cnt-transform { background:rgba(245,166,35,0.2); color:var(--warn); }
-  .cnt-load      { background:rgba(62,207,142,0.2); color:var(--success); }
+  .block-header:hover { background:rgba(255,255,255,.02); }
+  .block-card.active .block-header { background:rgba(79,142,247,.04); }
 
-  .canvas-node-title { font-size:13px; font-weight:500; flex:1; }
-  .canvas-node-remove { font-size:14px; color:var(--text3); cursor:pointer; padding:0 2px; }
-  .canvas-node-remove:hover { color:var(--danger); }
+  .block-type-icon {
+    width:36px; height:36px; border-radius:8px; display:flex; align-items:center;
+    justify-content:center; font-size:16px; flex-shrink:0;
+  }
+  .block-type-tag { font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px; font-family:var(--mono); letter-spacing:.04em; flex-shrink:0; }
+  .btt-extract   { background:rgba(79,142,247,.2);  color:var(--accent); }
+  .btt-join      { background:rgba(167,139,250,.2); color:#a78bfa; }
+  .btt-transform { background:rgba(245,166,35,.2);  color:var(--warn); }
+  .btt-load      { background:rgba(62,207,142,.2);  color:var(--success); }
 
-  .canvas-node-body { padding:12px; display:flex; flex-direction:column; gap:8px; }
+  .block-title { font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .block-subtitle { font-size:11px; color:var(--text3); margin-top:2px; font-family:var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:140px; }
+  .block-status { font-size:10px; font-family:var(--mono); color:var(--text3); flex-shrink:0; white-space:nowrap; }
+  .block-status.ok { color:var(--success); }
+  .block-status.err { color:var(--danger); }
 
-  .node-field { display:flex; flex-direction:column; gap:4px; }
+  .block-footer { display:flex; gap:6px; padding:8px 12px; border-top:1px solid var(--border); }
+  .block-open-btn {
+    font-size:11px; font-weight:500; font-family:var(--sans); padding:5px 12px;
+    border-radius:4px; border:1px solid var(--border); cursor:pointer;
+    transition:all .15s; background:var(--bg3); color:var(--text2); flex:1;
+  }
+  .block-open-btn:hover { border-color:var(--accent); color:var(--accent); background:rgba(79,142,247,.06); }
+  .block-remove-btn {
+    font-size:11px; font-family:var(--sans); padding:5px 10px; border-radius:4px;
+    border:1px solid var(--border); cursor:pointer; transition:all .15s;
+    background:transparent; color:var(--text3);
+  }
+  .block-remove-btn:hover { border-color:var(--danger); color:var(--danger); }
+
+  .node-type-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; display:inline-block; }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel-header {
+    padding:10px 16px; border-bottom:1px solid var(--border);
+    background:var(--bg2); flex-shrink:0; display:flex; align-items:center; gap:10px;
+  }
+  .right-panel-title { font-size:13px; font-weight:600; }
+  .right-panel-tabs { display:flex; gap:4px; margin-left:auto; }
+  .rp-tab { font-size:11px; padding:4px 12px; border-radius:4px; cursor:pointer; color:var(--text2); border:1px solid transparent; transition:all .15s; }
+  .rp-tab:hover { color:var(--text); }
+  .rp-tab.active { background:rgba(79,142,247,.1); color:var(--accent); border-color:rgba(79,142,247,.3); }
+
+  .config-area { padding:14px 16px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:10px; }
+  .config-section { background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:12px; }
+  .config-section-title { font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.08em; margin-bottom:10px; }
+
+  .node-field { display:flex; flex-direction:column; gap:4px; margin-bottom:8px; }
+  .node-field:last-child { margin-bottom:0; }
   .node-field label { font-size:11px; color:var(--text2); }
   .node-select, .node-input {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 5px 8px;
-    border-radius: 4px;
-    outline: none;
-    width: 100%;
+    background:var(--bg3); border:1px solid var(--border); color:var(--text);
+    font-family:var(--mono); font-size:11px; padding:5px 8px; border-radius:4px; outline:none; width:100%;
   }
-  .node-select:focus, .node-input:focus { border-color: var(--accent); }
-
-  .node-connector-arrow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 0;
-    color: var(--text3);
-    font-size: 18px;
-    flex-shrink: 0;
-    align-self: center;
-    margin-top: 32px;
-  }
-
-  /* field mapper */
-  .field-mapper { display:flex; flex-direction:column; gap:4px; max-height:200px; overflow-y:auto; }
-  .field-map-row {
-    display: grid;
-    grid-template-columns: 1fr 20px 1fr;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-  }
-  .field-map-row span { text-align:center; color:var(--text3); }
+  .node-select:focus, .node-input:focus { border-color:var(--accent); }
 
   /* transform ops */
-  .transform-ops { display:flex; flex-direction:column; gap:6px; }
-  .transform-op {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 8px;
-    font-size:11px;
-    position: relative;
-  }
-  .transform-op-header { display:flex; align-items:center; gap:6px; margin-bottom:6px; font-weight:600; color:var(--text2); }
-  .transform-op .remove-op { position:absolute; top:6px; right:6px; cursor:pointer; color:var(--text3); font-size:13px; }
-  .transform-op .remove-op:hover { color:var(--danger); }
+  .transform-op { background:var(--bg3); border:1px solid var(--border); border-radius:5px; padding:8px; margin-bottom:6px; position:relative; }
+  .transform-op-type { font-size:10px; font-weight:700; color:var(--text2); margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+  .remove-op { position:absolute; top:6px; right:6px; cursor:pointer; color:var(--text3); font-size:12px; line-height:1; }
+  .remove-op:hover { color:var(--danger); }
+  .add-op-btn { background:transparent; border:1px dashed var(--border); color:var(--text3); font-size:11px; padding:5px; border-radius:4px; cursor:pointer; width:100%; transition:all .15s; }
+  .add-op-btn:hover { border-color:var(--accent); color:var(--accent); }
 
-  .add-op-btn {
-    background: transparent;
-    border: 1px dashed var(--border);
-    color: var(--text3);
-    font-size: 11px;
-    padding: 5px;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    transition: all 0.15s;
-  }
-  .add-op-btn:hover { border-color: var(--accent); color: var(--accent); }
+  /* data preview table */
+  .data-preview-wrap { flex:1; overflow:auto; }
+  .data-preview-wrap::-webkit-scrollbar { width:6px; height:6px; }
+  .data-preview-wrap::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+  .dp-table { width:100%; border-collapse:collapse; font-size:11px; font-family:var(--mono); white-space:nowrap; }
+  .dp-table thead tr { background:var(--bg3); position:sticky; top:0; z-index:5; }
+  .dp-table th { padding:7px 12px; text-align:left; font-size:10px; font-weight:600; color:var(--text2); border-bottom:1px solid var(--border); text-transform:uppercase; letter-spacing:.03em; }
+  .dp-table th.new-col { color:var(--warn); }
+  .dp-table td { padding:5px 12px; border-bottom:1px solid rgba(42,51,71,.4); color:var(--text2); max-width:200px; overflow:hidden; text-overflow:ellipsis; }
+  .dp-table tbody tr:hover td { background:rgba(79,142,247,.04); color:var(--text); }
+  .dp-table td.new-col-val { color:var(--warn); }
+  .cell-null { color:var(--text3); font-style:italic; }
+  .cell-bool-t { color:var(--success); }
+  .cell-bool-f { color:var(--danger); }
+  .cell-date { color:#a78bfa; }
+  .cell-num  { color:var(--warn); }
+  .preview-meta-bar { padding:5px 12px; border-top:1px solid var(--border); font-size:10px; color:var(--text3); font-family:var(--mono); background:var(--bg2); flex-shrink:0; display:flex; gap:14px; }
+  .preview-meta-bar span { color:var(--text2); }
+
+  /* field mapper */
+  .field-mapper-wrap { display:flex; gap:0; height:100%; overflow:hidden; }
+  .fmap-col { flex:1; display:flex; flex-direction:column; overflow:hidden; border-right:1px solid var(--border); }
+  .fmap-col:last-child { border-right:none; }
+  .fmap-col-header { padding:8px 12px; font-size:11px; font-weight:600; color:var(--text2); border-bottom:1px solid var(--border); background:var(--bg3); flex-shrink:0; }
+  .fmap-list { flex:1; overflow-y:auto; padding:6px; }
+  .fmap-list::-webkit-scrollbar { width:4px; }
+  .fmap-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+  .fmap-field { padding:6px 10px; border-radius:4px; font-size:11px; font-family:var(--mono); cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:6px; transition:all .15s; margin-bottom:2px; border:1px solid transparent; }
+  .fmap-field:hover { background:var(--bg3); }
+  .fmap-field.selected { background:rgba(79,142,247,.1); border-color:rgba(79,142,247,.3); color:var(--accent); }
+  .fmap-field.mapped { background:rgba(62,207,142,.06); border-color:rgba(62,207,142,.2); }
+  .fmap-field-name { color:var(--text); }
+  .fmap-field-label { color:var(--text2); font-size:10px; font-family:var(--sans); }
+  .fmap-field-type { font-size:9px; padding:1px 5px; border-radius:3px; flex-shrink:0; }
+  .ft-s { background:rgba(79,142,247,.15); color:var(--accent); }
+  .ft-n { background:rgba(245,166,35,.15); color:var(--warn); }
+  .ft-d { background:rgba(167,139,250,.15); color:#a78bfa; }
+  .ft-b { background:rgba(62,207,142,.15); color:var(--success); }
+  .fmap-center { width:200px; flex-shrink:0; display:flex; flex-direction:column; overflow:hidden; border-right:1px solid var(--border); background:var(--bg); }
+  .fmap-center-header { padding:8px 12px; font-size:11px; font-weight:600; color:var(--text2); border-bottom:1px solid var(--border); background:var(--bg3); flex-shrink:0; display:flex; justify-content:space-between; align-items:center; }
+  .fmap-mappings { flex:1; overflow-y:auto; padding:6px; }
+  .fmap-row { display:flex; align-items:center; gap:4px; padding:4px 6px; border-radius:4px; background:var(--bg2); border:1px solid var(--border); margin-bottom:4px; font-size:11px; font-family:var(--mono); cursor:pointer; }
+  .fmap-row:hover { border-color:var(--danger); }
+  .fmap-row-from { flex:1; color:var(--accent); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .fmap-row-arrow { color:var(--text3); flex-shrink:0; }
+  .fmap-row-to { flex:1; color:var(--success); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .fmap-row-del { color:var(--text3); cursor:pointer; flex-shrink:0; font-size:12px; }
+  .fmap-row-del:hover { color:var(--danger); }
+  .fmap-hint { font-size:11px; color:var(--text3); text-align:center; padding:20px; line-height:1.6; }
 
   /* run log */
-  .log-line { margin-bottom:2px; }
+  .log-line { margin-bottom:2px; line-height:1.5; }
   .log-ok   { color:var(--success); }
   .log-err  { color:var(--danger); }
   .log-info { color:var(--text2); }
   .log-warn { color:var(--warn); }
+  .section-header { font-size:12px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.08em; padding:8px 10px 4px; }
+
 </style>
 </head>
 <body>
@@ -1142,18 +1126,19 @@
           <div style="width:320px; flex-shrink:0; display:flex; flex-direction:column; border-right:1px solid var(--border); overflow:hidden;">
 
             <!-- Add block buttons -->
-            <div style="padding:10px 12px; border-bottom:1px solid var(--border); background:var(--bg2); display:flex; gap:6px; flex-wrap:wrap;">
-              <button class="add-block-btn extract" onclick="addNode('extract')">+ Extract</button>
-              <button class="add-block-btn join"    onclick="addNode('join')">+ Join</button>
-              <button class="add-block-btn transform" onclick="addNode('transform')">+ Transform</button>
-              <button class="add-block-btn load"    onclick="addNode('load')">+ Load</button>
+            <div style="padding:10px 12px; border-bottom:1px solid var(--border); background:var(--bg2); display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+              <span style="font-size:11px; color:var(--text3); margin-right:2px;">Add:</span>
+              <button class="add-block-btn extract" onclick="addNode('extract')"><span class="node-type-dot" style="background:var(--accent);width:7px;height:7px;display:inline-block;border-radius:50%;margin-right:5px;"></span>Extract</button>
+              <button class="add-block-btn join"    onclick="addNode('join')"><span class="node-type-dot" style="background:#a78bfa;width:7px;height:7px;display:inline-block;border-radius:50%;margin-right:5px;"></span>Join</button>
+              <button class="add-block-btn transform" onclick="addNode('transform')"><span class="node-type-dot" style="background:var(--warn);width:7px;height:7px;display:inline-block;border-radius:50%;margin-right:5px;"></span>Transform</button>
+              <button class="add-block-btn load"    onclick="addNode('load')"><span class="node-type-dot" style="background:var(--success);width:7px;height:7px;display:inline-block;border-radius:50%;margin-right:5px;"></span>Load</button>
             </div>
 
             <!-- Pipeline blocks list -->
-            <div id="pipelineBlocks" style="flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:0;">
-              <div id="pipelineEmpty" style="text-align:center; padding:40px 20px; color:var(--text3); font-size:13px;">
-                Add blocks above to build your pipeline
-              </div>
+            <div id="pipelineEmpty" style="text-align:center; padding:40px 20px; color:var(--text3); font-size:13px; display:none;">
+              Add blocks above to build your pipeline
+            </div>
+            <div id="pipelineBlocks" style="flex:1; overflow-y:auto; padding:12px; display:none; flex-direction:column; gap:0;">
             </div>
           </div>
 
@@ -2186,21 +2171,46 @@ function renderPipelineBlocks() {
   if (!state.editingFlow) return;
   const nodes = state.editingFlow.nodes;
   emptyMsg.style.display = nodes.length===0 ? '' : 'none';
+  container.style.display = nodes.length===0 ? 'none' : 'flex';
+
+  const typeColors = { extract:'btt-extract', join:'btt-join', transform:'btt-transform', load:'btt-load' };
+  const typeAccent = { extract:'var(--accent)', join:'#a78bfa', transform:'var(--warn)', load:'var(--success)' };
+  const typeIcons  = { extract:'⬇', join:'⊕', transform:'⚙', load:'⬆' };
+  const typeDesc   = { extract:'Reads data from GetConnector', join:'Merges two datasets', transform:'Filters & calculates', load:'Writes to UpdateConnector' };
 
   container.innerHTML = nodes.map((node, i) => {
     const ds = state.blockDatasets[node.id];
-    const rowCount = ds ? `${ds.length} rows` : '';
-    const statusClass = ds ? 'ok' : '';
+    const rowCount = ds ? `${ds.length} rows` : null;
     const isActive = node.id === state.activeBlockId;
     const connector = i > 0 ? `<div class="pipeline-connector"><span>↓</span></div>` : '';
-    const typeColors = { extract:'btt-extract', join:'btt-join', transform:'btt-transform', load:'btt-load' };
+
+    // Subtitle based on config
+    let subtitle = typeDesc[node.type];
+    if (node.type==='extract' && node.connectorId) subtitle = node.connectorId;
+    else if (node.type==='load' && node.connectorId) subtitle = node.connectorId;
+    else if (node.type==='transform' && (node.ops||[]).length>0) subtitle = `${node.ops.length} operation${node.ops.length>1?'s':''}`;
+    else if (node.type==='join' && node.leftField) subtitle = `${node.leftField} = ${node.rightField}`;
+
     return `${connector}
-    <div class="block-card${isActive?' active':''}" id="block_${node.id}" onclick="selectBlock('${node.id}')">
-      <div class="block-header">
-        <span class="block-type-tag ${typeColors[node.type]}">${node.type.toUpperCase()}</span>
-        <span class="block-title">${node.label}</span>
-        <span class="block-status ${statusClass}">${rowCount}</span>
-        <span class="block-remove" onclick="removeNode('${node.id}', event)">✕</span>
+    <div class="block-card${isActive?' active':''}" id="block_${node.id}">
+      <div class="block-header" onclick="selectBlock('${node.id}')">
+        <div class="block-type-icon" style="background:${typeAccent[node.type]}22; color:${typeAccent[node.type]}; border:1px solid ${typeAccent[node.type]}44;">
+          ${typeIcons[node.type]}
+        </div>
+        <div style="flex:1; min-width:0;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="block-type-tag ${typeColors[node.type]}">${node.type.toUpperCase()}</span>
+            <span class="block-title">${node.label}</span>
+          </div>
+          <div class="block-subtitle">${subtitle}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+          ${rowCount ? `<span class="block-status ok">${rowCount}</span>` : `<span class="block-status">not run</span>`}
+        </div>
+      </div>
+      <div class="block-footer">
+        <button class="block-open-btn" onclick="selectBlock('${node.id}')">Open →</button>
+        <button class="block-remove-btn" onclick="removeNode('${node.id}', event)">Remove</button>
       </div>
     </div>`;
   }).join('');
